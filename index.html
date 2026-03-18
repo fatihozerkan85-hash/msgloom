@@ -1,0 +1,722 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Msgloom - Instagram Sat&#305;c&#305;lar&#305; i&#231;in WhatsApp Sat&#305;&#351; Otomasyonu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#09090b;--surface:#111114;--surface2:#18181b;--surface3:#1f1f23;
+--text:#fafafa;--text-muted:#a1a1aa;--text-dim:#52525b;
+--green:#25d366;--green-glow:rgba(37,211,102,.12);--green-dark:#1eba59;
+--pink:#e1306c;--pink-glow:rgba(225,48,108,.1);
+--purple:#833ab4;--purple-glow:rgba(131,58,180,.1);
+--blue:#2AABEE;--blue-glow:rgba(42,171,238,.1);
+--orange:#f59e0b;--orange-glow:rgba(245,158,11,.1);
+--red:#ef4444;
+--border:rgba(255,255,255,.06);--border-hover:rgba(255,255,255,.12);
+--radius:12px;--radius-lg:20px;
+--transition:.25s cubic-bezier(.4,0,.2,1)
+}
+body{font-family:'Inter',sans-serif;background:#09090b;background-image:linear-gradient(135deg,#09090b 0%,#0c1a2e 20%,#0f0a1e 40%,#091a1a 60%,#1a0c1a 80%,#09090b 100%);background-attachment:fixed;color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* Navbar */
+.navbar{position:sticky;top:0;z-index:100;background:rgba(9,9,11,.7);backdrop-filter:blur(30px) saturate(200%);border-bottom:1px solid rgba(255,255,255,.04);padding:0 2rem}
+.navbar-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1.2rem;color:var(--text);letter-spacing:-.5px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px}
+.nav-links{display:flex;gap:1.75rem;list-style:none}
+.nav-links a{text-decoration:none;color:var(--text-muted);font-size:.84rem;font-weight:500;transition:color var(--transition)}
+.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:.6rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 20px;border-radius:8px;font-size:.84rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--transition);text-decoration:none;border:none;white-space:nowrap}
+.btn-ghost{background:transparent;color:var(--text-muted);padding:9px 14px}.btn-ghost:hover{color:var(--text)}
+.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 4px 20px var(--green-glow)}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.btn-lg{padding:13px 28px;font-size:.92rem;border-radius:10px}
+.btn-full{width:100%}
+.btn-whatsapp{background:var(--green);color:#fff;gap:8px}.btn-whatsapp:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 4px 20px var(--green-glow)}
+.btn-pulse{animation:btnpulse 2s infinite}
+@keyframes btnpulse{0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,.3)}50%{box-shadow:0 0 0 8px rgba(37,211,102,0)}}
+
+/* Hero */
+.hero{max-width:1140px;margin:0 auto;padding:4rem 2rem 2rem;text-align:center;position:relative;z-index:1}
+.hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,var(--green-glow) 0%,var(--pink-glow) 30%,transparent 65%);pointer-events:none;opacity:.6}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);padding:5px 14px 5px 6px;border-radius:30px;font-size:.75rem;font-weight:500;color:var(--text-muted);margin-bottom:1.25rem;position:relative}
+.hero-badge .dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,.4)}50%{box-shadow:0 0 0 6px rgba(37,211,102,0)}}
+.hero h1{font-size:3rem;font-weight:900;line-height:1.12;margin-bottom:1rem;letter-spacing:-.03em;position:relative}
+.hero h1 .gr-green{background:linear-gradient(135deg,var(--green),#34d058);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero h1 .gr-pink{background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-value{font-size:1.05rem;color:var(--text-muted);max-width:580px;margin:0 auto 1rem;line-height:1.7;position:relative}
+.hero-value strong{color:var(--text);font-weight:600}
+.hero-golden{background:var(--surface2);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 20px;display:inline-block;margin-bottom:1.5rem;position:relative}
+.hero-golden p{font-size:.88rem;color:var(--orange);font-weight:600;margin:0}
+.hero-actions{display:flex;gap:.75rem;justify-content:center;position:relative;flex-wrap:wrap}
+.hero-checks{display:flex;align-items:center;justify-content:center;gap:1.25rem;margin-top:1.5rem;position:relative;flex-wrap:wrap}
+.hero-check{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--text-muted);font-weight:500}
+.hero-check svg{flex-shrink:0}
+.hero-urgency{margin-top:1rem;position:relative}
+.hero-urgency p{font-size:.8rem;color:var(--red);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.hero-timeline{margin-top:.75rem;position:relative}
+.hero-timeline p{font-size:.85rem;font-weight:700;color:var(--green)}
+
+/* Price Banner */
+.price-banner{max-width:1140px;margin:0 auto;padding:1.5rem 2rem;position:relative;z-index:1}
+.price-banner-inner{background:linear-gradient(135deg,rgba(24,24,27,.5),rgba(31,31,35,.4));backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:2rem;display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap}
+.price-item{text-align:center}
+.price-item .label{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:.25rem}
+.price-item .amount{font-size:1.8rem;font-weight:900;color:var(--green)}
+.price-item .period{font-size:.8rem;color:var(--text-dim)}
+.price-divider{width:1px;height:50px;background:var(--border)}
+.price-includes{display:flex;flex-direction:column;gap:6px}
+.price-includes span{font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+
+/* Problem Section */
+.section{max-width:1140px;margin:0 auto;padding:3.5rem 2rem;position:relative;z-index:1}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:.75rem}
+.section-title{font-size:1.8rem;font-weight:800;line-height:1.2;margin-bottom:.5rem;letter-spacing:-.02em}
+.section-desc{font-size:.92rem;color:var(--text-muted);max-width:540px;line-height:1.7}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin-top:2rem}
+.problem-card{background:rgba(17,17,20,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1.5rem;transition:all var(--transition)}
+.problem-card:hover{border-color:var(--border-hover);transform:translateY(-2px)}
+.problem-card .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;font-size:1.2rem}
+.problem-card h3{font-size:.95rem;font-weight:700;margin-bottom:.35rem}
+.problem-card p{font-size:.82rem;color:var(--text-muted);line-height:1.6}
+
+/* How It Works */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;position:relative}
+.steps::before{content:'';position:absolute;top:35px;left:calc(16.66% + 20px);right:calc(16.66% + 20px);height:2px;background:linear-gradient(90deg,var(--green),var(--blue));opacity:.3}
+.step{text-align:center;position:relative}
+.step-num{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:var(--green);margin:0 auto .75rem;position:relative;z-index:1}
+.step h3{font-size:.92rem;font-weight:700;margin-bottom:.3rem}
+.step p{font-size:.8rem;color:var(--text-muted);line-height:1.6}
+/* Before/After */
+.before-after{margin-top:3rem}
+.ba-grid{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:stretch;margin-top:2rem}
+.ba-card{background:rgba(17,17,20,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1.5rem;position:relative}
+.ba-card.before{border-color:rgba(239,68,68,.2)}
+.ba-card.after{border-color:rgba(37,211,102,.2)}
+.ba-card .ba-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+.ba-card.before .ba-label{color:var(--red)}
+.ba-card.after .ba-label{color:var(--green)}
+.ba-arrow{display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--green)}
+.ba-msg{display:flex;gap:8px;margin-bottom:.6rem;align-items:flex-start}
+.ba-msg .avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.ba-msg .bubble{padding:8px 12px;border-radius:10px;font-size:.78rem;line-height:1.5;max-width:85%}
+.ba-msg.customer .avatar{background:var(--surface3)}
+.ba-msg.customer .bubble{background:var(--surface2);color:var(--text-muted)}
+.ba-msg.seller .avatar{background:var(--pink-glow);color:var(--pink)}
+.ba-msg.seller .bubble{background:var(--surface3);color:var(--text-muted)}
+.ba-msg.bot .avatar{background:var(--green-glow);color:var(--green)}
+.ba-msg.bot .bubble{background:rgba(37,211,102,.08);color:var(--text);border:1px solid rgba(37,211,102,.15)}
+.ba-stat{margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.ba-stat span{font-size:.72rem;color:var(--text-dim)}
+.ba-stat strong{font-size:.82rem}
+.ba-card.before .ba-stat strong{color:var(--red)}
+.ba-card.after .ba-stat strong{color:var(--green)}
+
+/* Features */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:2rem}
+.feature-card{background:rgba(17,17,20,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1.5rem;transition:all var(--transition)}
+.feature-card:hover{border-color:var(--border-hover);transform:translateY(-2px)}
+.feature-card .f-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;font-size:1.1rem}
+.feature-card h3{font-size:.92rem;font-weight:700;margin-bottom:.3rem}
+.feature-card p{font-size:.8rem;color:var(--text-muted);line-height:1.6}
+
+/* Demo */
+.demo-section{text-align:center}
+.phone-mockup{width:340px;margin:2rem auto 0;background:rgba(17,17,20,.7);border:2px solid rgba(255,255,255,.06);border-radius:28px;overflow:hidden;position:relative;backdrop-filter:blur(12px)}
+.phone-header{background:var(--surface2);padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.phone-header .ph-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-glow);display:flex;align-items:center;justify-content:center}
+.phone-header .ph-info h4{font-size:.8rem;font-weight:600;color:var(--text)}
+.phone-header .ph-info span{font-size:.65rem;color:var(--green)}
+.chat-area{padding:16px;min-height:320px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.chat-msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:.8rem;line-height:1.5;animation:msgIn .4s ease}
+.chat-msg.bot{align-self:flex-start;background:var(--surface2);color:var(--text);border-bottom-left-radius:4px}
+.chat-msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:4px}
+.chat-msg .discount-badge{display:inline-block;background:var(--orange);color:#fff;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:4px}
+.chat-msg .urgency-text{color:var(--red);font-weight:600;font-size:.75rem;margin-top:4px}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.chat-buttons{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.chat-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--green);background:transparent;color:var(--green);font-size:.75rem;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:inherit}
+.chat-btn:hover{background:var(--green);color:#fff}
+.typing-indicator{display:flex;gap:4px;padding:10px 14px;align-self:flex-start}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:typing 1.2s infinite}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* Testimonials */
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin-top:2rem}
+.testimonial-card{background:rgba(17,17,20,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1.5rem}
+.testimonial-card .stars{color:var(--orange);font-size:.85rem;margin-bottom:.5rem}
+.testimonial-card p{font-size:.85rem;color:var(--text-muted);line-height:1.7;margin-bottom:.75rem;font-style:italic}
+.testimonial-card .author{display:flex;align-items:center;gap:8px}
+.testimonial-card .author-avatar{width:32px;height:32px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:.75rem}
+.testimonial-card .author-info span{font-size:.8rem;font-weight:600;display:block}
+.testimonial-card .author-info small{font-size:.7rem;color:var(--text-dim)}
+
+/* CTA */
+.cta-section{text-align:center;padding:4rem 2rem;position:relative;z-index:1}
+.cta-box{max-width:640px;margin:0 auto;background:linear-gradient(135deg,rgba(37,211,102,.08),rgba(42,171,238,.08),rgba(131,58,180,.05));backdrop-filter:blur(16px);border:1px solid rgba(37,211,102,.15);border-radius:var(--radius-lg);padding:3rem 2rem;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,var(--green-glow),transparent 60%);opacity:.3;pointer-events:none}
+.cta-box h2{font-size:1.6rem;font-weight:800;margin-bottom:.5rem;position:relative}
+.cta-box .cta-sub{font-size:.9rem;color:var(--text-muted);margin-bottom:1.5rem;position:relative}
+.cta-box .cta-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;position:relative;z-index:1}
+footer p{font-size:.78rem;color:var(--text-dim)}
+
+/* Screenshot mockup */
+.screenshot-section{margin-top:2rem}
+.ss-mockup{background:rgba(17,17,20,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1rem;max-width:380px;margin:1.5rem auto 0}
+.ss-mockup .ss-header{display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.ss-mockup .ss-avatar{width:36px;height:36px;border-radius:50%;background:var(--green-glow);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.ss-mockup .ss-name{font-size:.82rem;font-weight:600}
+.ss-mockup .ss-status{font-size:.65rem;color:var(--green)}
+.ss-chat{display:flex;flex-direction:column;gap:6px}
+.ss-bubble{padding:8px 12px;border-radius:10px;font-size:.78rem;line-height:1.5;max-width:80%}
+.ss-bubble.incoming{background:var(--surface2);color:var(--text);align-self:flex-start;border-bottom-left-radius:3px}
+.ss-bubble.outgoing{background:rgba(37,211,102,.12);color:var(--text);align-self:flex-end;border-bottom-right-radius:3px;border:1px solid rgba(37,211,102,.15)}
+.ss-bubble .time{font-size:.6rem;color:var(--text-dim);text-align:right;margin-top:3px}
+.ss-result{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);text-align:center}
+.ss-result span{font-size:.72rem;color:var(--green);font-weight:600}
+
+/* Responsive */
+@media(max-width:768px){
+.hero h1{font-size:2rem}
+.nav-links{display:none}
+.steps{grid-template-columns:1fr;gap:1.5rem}
+.steps::before{display:none}
+.ba-grid{grid-template-columns:1fr;gap:1rem}
+.ba-arrow{transform:rotate(90deg)}
+.price-banner-inner{flex-direction:column;gap:1.5rem}
+.price-divider{width:50px;height:1px}
+.phone-mockup{width:100%;max-width:340px}
+}
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<!-- Navbar -->
+<nav class="navbar">
+<div class="navbar-inner">
+<a href="#" class="logo">
+<div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+Msgloom
+</a>
+<ul class="nav-links">
+<li><a href="#nasil">Nas&#305;l &#199;al&#305;&#351;&#305;r</a></li>
+<li><a href="#demo">Canl&#305; Demo</a></li>
+<li><a href="#fiyat">Fiyat</a></li>
+<li><a href="#referans">Referanslar</a></li>
+</ul>
+<div class="nav-right">
+<a href="https://wa.me/905551234567?text=Merhaba%20siteyi%20inceledim%2C%20botu%20kurmak%20istiyorum" class="btn btn-primary btn-pulse">&#x1F916; Botu Kur (24 Saatte)</a>
+</div>
+</div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+<div class="hero-badge"><span class="dot"></span> Instagram sat&#305;c&#305;lar&#305; i&#231;in &#246;zel &#231;&#246;z&#252;m</div>
+<h1>
+<span class="gr-pink">Instagram</span>&#8217;dan Gelen Mesajlar&#305;<br>
+<span class="gr-green">Otomatik Sat&#305;&#351;a</span> &#199;evir
+</h1>
+<p class="hero-value">
+Bu bot m&#252;&#351;terilere <strong>otomatik cevap vererek</strong> sat&#305;&#351; ka&#231;&#305;rmaman&#305;z&#305; sa&#287;lar.<br>
+Bir bot de&#287;il, <strong>para kazand&#305;ran bir sistem</strong> kuruyoruz.
+</p>
+<div class="hero-golden">
+<p>&#128176; Bug&#252;n kur &#8594; yar&#305;n sat&#305;&#351; ba&#351;la</p>
+<p style="font-size:.78rem;color:var(--text-muted);margin-top:4px;font-weight:400">&#128202; Bug&#252;n kurulan botlar ortalama 24 saat i&#231;inde ilk sipari&#351;ini al&#305;yor</p>
+</div>
+<div class="hero-actions">
+<a href="https://wa.me/905551234567?text=Merhaba%20siteyi%20inceledim%2C%20botu%20kurmak%20istiyorum" class="btn btn-whatsapp btn-lg btn-pulse">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.387 0-4.592-.826-6.326-2.207l-.372-.296-2.647.888.888-2.647-.296-.372A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+Bug&#252;n Kurulumu Ba&#351;lat
+</a>
+<a href="#demo" class="btn btn-outline btn-lg">Canl&#305; Demo G&#246;r</a>
+</div>
+<div class="hero-checks">
+<span class="hero-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 24 saat i&#231;inde kurulum</span>
+<span class="hero-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Kod gerekmez</span>
+<span class="hero-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Sat&#305;&#351; art&#305;rmaya odakl&#305;</span>
+</div>
+<div class="hero-urgency">
+<p>&#9889; S&#305;n&#305;rl&#305; say&#305;da kurulum al&#305;yoruz (g&#252;nde 3 m&#252;&#351;teri)</p>
+</div>
+<div class="hero-timeline">
+<p>&#128640; Bug&#252;n kur &#8594; yar&#305;n sat&#305;&#351; ba&#351;la</p>
+</div>
+</section>
+
+<!-- Price Banner -->
+<section class="price-banner" id="fiyat">
+<div class="price-banner-inner">
+<div class="price-item">
+<div class="label">Kurulum (tek seferlik)</div>
+<div class="amount">2.500 &#8378;</div>
+<div class="period">Size &#246;zel kurulum yap&#305;yoruz</div>
+</div>
+<div class="price-divider"></div>
+<div class="price-item">
+<div class="label">Ayl&#305;k</div>
+<div class="amount">500 &#8378;</div>
+<div class="period">Destek + g&#252;ncelleme dahil</div>
+</div>
+<div class="price-divider"></div>
+<div class="price-includes">
+<span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 24 saat i&#231;inde kurulum</span>
+<span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> WhatsApp + Telegram deste&#287;i</span>
+<span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> S&#305;n&#305;rs&#305;z mesaj</span>
+<span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> &#220;r&#252;n katalogu entegrasyonu</span>
+</div>
+</div>
+</section>
+<!-- Problem Section -->
+<section class="section">
+<div class="section-label">&#128308; Problem</div>
+<div class="section-title">Instagram&#8217;dan Mesaj Geliyor Ama Sat&#305;&#351; Olmuyor</div>
+<p class="section-desc">M&#252;&#351;teriler yaz&#305;yor, siz ge&#231; cevap veriyorsunuz. Ge&#231; cevap = kay&#305;p sat&#305;&#351;.</p>
+<div class="problem-grid">
+<div class="problem-card">
+<div class="icon" style="background:var(--red);background:rgba(239,68,68,.1)">&#128337;</div>
+<h3>Ge&#231; Cevap = Kay&#305;p M&#252;&#351;teri</h3>
+<p>M&#252;&#351;teri 5 dakika i&#231;inde cevap alamazsa rakibe gider. Gece gelen mesajlar sabaha kadar bekler.</p>
+</div>
+<div class="problem-card">
+<div class="icon" style="background:rgba(245,158,11,.1)">&#128260;</div>
+<h3>Ayn&#305; Sorular&#305; Tekrar Tekrar</h3>
+<p>&#8220;Fiyat ne?&#8221; &#8220;Kargo ka&#231; g&#252;n?&#8221; &#8220;Stokta var m&#305;?&#8221; &#8212; Her g&#252;n ayn&#305; sorulara ayn&#305; cevaplar.</p>
+</div>
+<div class="problem-card">
+<div class="icon" style="background:rgba(131,58,180,.1)">&#128200;</div>
+<h3>Sat&#305;&#351; Takibi Yok</h3>
+<p>Kim yazd&#305;, kim ald&#305;, kim vazge&#231;ti? Takip edemiyorsunuz, f&#305;rsatlar ka&#231;&#305;yor.</p>
+</div>
+</div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="nasil">
+<div class="section-label">&#9889; Nas&#305;l &#199;al&#305;&#351;&#305;r</div>
+<div class="section-title">3 Ad&#305;mda Sat&#305;&#351; Otomasyonu</div>
+<p class="section-desc">Kurulum bize b&#305;rak&#305;n, siz sat&#305;&#351;a odaklan&#305;n.</p>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<h3>Botu Kuruyoruz</h3>
+<p>&#220;r&#252;nlerinizi, fiyatlar&#305;n&#305;z&#305; ve mesaj &#351;ablonlar&#305;n&#305;z&#305; sisteme giriyoruz. 24 saat i&#231;inde haz&#305;r.</p>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<h3>M&#252;&#351;teri Yaz&#305;yor</h3>
+<p>Instagram&#8217;dan WhatsApp&#8217;a y&#246;nlendirilen m&#252;&#351;teri mesaj at&#305;yor.</p>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<h3>Bot Sat&#305;&#351; Yap&#305;yor</h3>
+<p>Otomatik cevap, &#252;r&#252;n &#246;nerisi, indirim teklifi. Siz uyurken bile sat&#305;&#351;.</p>
+</div>
+</div>
+</section>
+
+<!-- Before / After -->
+<section class="section before-after">
+<div class="section-label">&#128200; &#214;nce / Sonra</div>
+<div class="section-title">Msgloom &#214;ncesi vs Sonras&#305;</div>
+<div class="ba-grid">
+<div class="ba-card before">
+<div class="ba-label">&#10060; &#214;ncesi (Manuel)</div>
+<div class="ba-msg customer">
+<div class="avatar">&#128100;</div>
+<div class="bubble">Merhaba, siyah &#231;anta ka&#231; TL?</div>
+</div>
+<div class="ba-msg customer">
+<div class="avatar">&#128100;</div>
+<div class="bubble">Hala cevap yok mu? &#128533;</div>
+</div>
+<div class="ba-msg seller">
+<div class="avatar">&#128105;</div>
+<div class="bubble">Pardon ge&#231; g&#246;rd&#252;m, 450 TL</div>
+</div>
+<div class="ba-msg customer">
+<div class="avatar">&#128100;</div>
+<div class="bubble">Ba&#351;ka yerden ald&#305;m zaten</div>
+</div>
+<div class="ba-stat">
+<span>Cevap s&#252;resi: <strong>3 saat</strong></span>
+<span>Sonu&#231;: <strong>Kay&#305;p sat&#305;&#351; &#10060;</strong></span>
+</div>
+</div>
+<div class="ba-arrow">&#10132;</div>
+<div class="ba-card after">
+<div class="ba-label">&#9989; Sonras&#305; (Msgloom)</div>
+<div class="ba-msg customer">
+<div class="avatar">&#128100;</div>
+<div class="bubble">Merhaba, siyah &#231;anta ka&#231; TL?</div>
+</div>
+<div class="ba-msg bot">
+<div class="avatar">&#129302;</div>
+<div class="bubble">Merhaba! &#128075; Siyah &#231;anta 450 TL. &#350;u an %10 indirimle 405 TL! Sipari&#351; vermek ister misiniz?</div>
+</div>
+<div class="ba-msg customer">
+<div class="avatar">&#128100;</div>
+<div class="bubble">Evet, sipari&#351; vermek istiyorum &#128522;</div>
+</div>
+<div class="ba-msg bot">
+<div class="avatar">&#129302;</div>
+<div class="bubble">Harika! &#127881; Adres bilgilerinizi yazar m&#305;s&#305;n&#305;z?</div>
+</div>
+<div class="ba-stat">
+<span>Cevap s&#252;resi: <strong>3 saniye</strong></span>
+<span>Sonu&#231;: <strong>Sat&#305;&#351; tamam &#9989;</strong></span>
+</div>
+</div>
+</div>
+</section>
+<!-- WhatsApp Screenshot Mockup (Trust Element) -->
+<section class="section screenshot-section">
+<div class="section-label">&#128172; Ger&#231;ek Konu&#351;ma</div>
+<div class="section-title">Msgloom Botu &#199;al&#305;&#351;&#305;rken</div>
+<p class="section-desc">Ger&#231;ek bir WhatsApp konu&#351;mas&#305;ndan &#246;rnek. Bot, m&#252;&#351;teriye an&#305;nda cevap veriyor.</p>
+<div class="ss-mockup">
+<div class="ss-header">
+<div class="ss-avatar">&#129302;</div>
+<div>
+<div class="ss-name">Msgloom Bot</div>
+<div class="ss-status">&#9679; &#199;evrimi&#231;i</div>
+</div>
+</div>
+<div class="ss-chat">
+<div class="ss-bubble incoming">Merhaba, beyaz spor ayakkab&#305; var m&#305;? <div class="time">14:32</div></div>
+<div class="ss-bubble outgoing">Merhaba! &#128075; Evet, beyaz spor ayakkab&#305; stokta. 38-44 numara mevcut. Fiyat: 899 TL. Bug&#252;n sipari&#351; verirseniz &#252;cretsiz kargo! &#128666; <div class="time">14:32</div></div>
+<div class="ss-bubble incoming">42 numara istiyorum <div class="time">14:33</div></div>
+<div class="ss-bubble outgoing">42 numara haz&#305;r! &#9989; Sipari&#351;inizi tamamlamak i&#231;in adres bilgilerinizi yazabilir misiniz? <div class="time">14:33</div></div>
+</div>
+<div class="ss-result">
+<span>&#9889; 1 dakikada sipari&#351; al&#305;nd&#305;</span>
+</div>
+</div>
+</section>
+
+<!-- Outcome Stats -->
+<section class="section" style="text-align:center">
+<div class="section-label">&#128200; Ne Kadar Kazand&#305;r&#305;r?</div>
+<div class="section-title">Rakamlar Kendi &#304;&#231;in Konu&#351;uyor</div>
+<p class="section-desc" style="margin:0 auto 2rem">Ortalama m&#252;&#351;terilerimiz ilk ayda <strong style="color:var(--green)">%30-70 daha fazla sat&#305;&#351;</strong> yap&#305;yor.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
+<div style="font-size:2rem;font-weight:900;color:var(--green)">%47</div>
+<div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">Ortalama sat&#305;&#351; art&#305;&#351;&#305;</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
+<div style="font-size:2rem;font-weight:900;color:var(--green)">3 sn</div>
+<div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">Ortalama cevap s&#252;resi</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
+<div style="font-size:2rem;font-weight:900;color:var(--green)">7/24</div>
+<div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">Kesintisiz &#231;al&#305;&#351;ma</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem">
+<div style="font-size:2rem;font-weight:900;color:var(--green)">24 sa</div>
+<div style="font-size:.8rem;color:var(--text-muted);margin-top:.25rem">&#304;lk sipari&#351;e kadar</div>
+</div>
+</div>
+</section>
+
+<!-- Features -->
+<section class="section">
+<div class="section-label">&#128640; &#214;zellikler</div>
+<div class="section-title">Para Kazand&#305;ran Sistem</div>
+<p class="section-desc">Sadece bir bot de&#287;il, sat&#305;&#351; ka&#231;&#305;rmaman&#305;z&#305; sa&#287;layan komple bir sistem.</p>
+<div class="features-grid">
+<div class="feature-card">
+<div class="f-icon" style="background:var(--green-glow)">&#9889;</div>
+<h3>An&#305;nda Cevap</h3>
+<p>M&#252;&#351;teri yazd&#305;&#287;&#305; anda otomatik cevap. Gece g&#252;nd&#252;z, 7/24 aktif.</p>
+</div>
+<div class="feature-card">
+<div class="f-icon" style="background:var(--pink-glow)">&#128722;</div>
+<h3>&#220;r&#252;n Katalogu</h3>
+<p>T&#252;m &#252;r&#252;nleriniz, fiyatlar&#305;n&#305;z ve stok bilgileri bot i&#231;inde. M&#252;&#351;teri sorunca an&#305;nda g&#246;sterir.</p>
+</div>
+<div class="feature-card">
+<div class="f-icon" style="background:var(--blue-glow)">&#128176;</div>
+<h3>Otomatik &#304;ndirim</h3>
+<p>&#8220;&#350;imdi al %10 indirim&#8221; gibi sat&#305;&#351; taktikleri. Urgency ile d&#246;n&#252;&#351;&#252;m oran&#305;n&#305; art&#305;r&#305;r.</p>
+</div>
+<div class="feature-card">
+<div class="f-icon" style="background:var(--orange-glow)">&#128202;</div>
+<h3>Sipari&#351; Takibi</h3>
+<p>Kim yazd&#305;, kim ald&#305;, kim vazge&#231;ti? T&#252;m verileri g&#246;r&#252;n, f&#305;rsatlar&#305; ka&#231;&#305;rmay&#305;n.</p>
+</div>
+<div class="feature-card">
+<div class="f-icon" style="background:var(--purple-glow)">&#128241;</div>
+<h3>WhatsApp + Telegram</h3>
+<p>Her iki kanaldan gelen mesajlar&#305; tek yerden y&#246;netin. &#199;oklu kanal, tek sistem.</p>
+</div>
+<div class="feature-card">
+<div class="f-icon" style="background:rgba(239,68,68,.1)">&#128274;</div>
+<h3>Size &#214;zel Kurulum</h3>
+<p>Haz&#305;r &#351;ablon de&#287;il, i&#351;inize &#246;zel kurulum. &#220;r&#252;nlerinize g&#246;re &#246;zelle&#351;tirilmi&#351; bot.</p>
+</div>
+</div>
+</section>
+<!-- Kimler &#304;&#231;in -->
+<section class="section" style="text-align:center">
+<div class="section-label">&#127919; Kimler &#304;&#231;in?</div>
+<div class="section-title">Kendini G&#246;r, Hemen Ba&#351;la</div>
+<p class="section-desc" style="margin:0 auto 2rem">E&#287;er a&#351;a&#287;&#305;dakilerden biriysen, bu sistem tam sana g&#246;re.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem">
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:left">
+<div style="font-size:1.2rem;margin-bottom:.5rem">&#128092;</div>
+<div style="font-size:.9rem;font-weight:700;margin-bottom:.25rem">Instagram Butik</div>
+<div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">El yap&#305;m&#305; &#252;r&#252;n, giyim, aksesuar satan Instagram ma&#287;azalar&#305;</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:left">
+<div style="font-size:1.2rem;margin-bottom:.5rem">&#128142;</div>
+<div style="font-size:.9rem;font-weight:700;margin-bottom:.25rem">Tak&#305; Sat&#305;c&#305;lar&#305;</div>
+<div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">El yap&#305;m&#305; tak&#305;, bijuteri ve aksesuar satan sat&#305;c&#305;lar</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:left">
+<div style="font-size:1.2rem;margin-bottom:.5rem">&#128132;</div>
+<div style="font-size:.9rem;font-weight:700;margin-bottom:.25rem">Kozmetik</div>
+<div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">Cilt bak&#305;m, makyaj ve kozmetik &#252;r&#252;n sat&#305;c&#305;lar&#305;</div>
+</div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:left">
+<div style="font-size:1.2rem;margin-bottom:.5rem">&#128230;</div>
+<div style="font-size:.9rem;font-weight:700;margin-bottom:.25rem">Dropshipping</div>
+<div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">Y&#252;ksek hacimli sipari&#351; alan dropshipping giri&#351;imcileri</div>
+</div>
+</div>
+</section>
+
+<!-- Interactive Demo -->
+<section class="section demo-section" id="demo">
+<div class="section-label">&#127916; Canl&#305; Demo</div>
+<div class="section-title">Botu &#350;imdi Dene</div>
+<p class="section-desc" style="margin:0 auto">A&#351;a&#287;&#305;daki butonlara t&#305;klayarak botun nas&#305;l &#231;al&#305;&#351;t&#305;&#287;&#305;n&#305; g&#246;r&#252;n.</p>
+<div class="phone-mockup">
+<div class="phone-header">
+<div class="ph-avatar">&#129302;</div>
+<div class="ph-info">
+<h4>Msgloom Bot</h4>
+<span>&#9679; &#199;evrimi&#231;i</span>
+</div>
+</div>
+<div class="chat-area" id="chatArea">
+<div class="chat-msg bot">Merhaba! &#128075; Ben sat&#305;&#351; asistan&#305;n&#305;z. Size nas&#305;l yard&#305;mc&#305; olabilirim?</div>
+</div>
+<div class="chat-buttons" id="chatButtons">
+<button class="chat-btn" onclick="sendMsg('urunler')">&#220;r&#252;nleri G&#246;r</button>
+<button class="chat-btn" onclick="sendMsg('fiyat')">Fiyat Bilgisi</button>
+<button class="chat-btn" onclick="sendMsg('kargo')">Kargo Bilgisi</button>
+<button class="chat-btn" onclick="sendMsg('siparis')">Sipari&#351; Ver</button>
+</div>
+</div>
+</section>
+
+<!-- Testimonials -->
+<section class="section" id="referans">
+<div class="section-label">&#11088; Referanslar</div>
+<div class="section-title">Kullananlar Ne Diyor?</div>
+<div class="testimonials-grid">
+<div class="testimonial-card">
+<div class="stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+<p>&#8220;Gece 2&#8217;de gelen mesajlara bile cevap veriyor. Sabah kalk&#305;nca 3 sipari&#351; haz&#305;r bekliyordu.&#8221;</p>
+<div class="author">
+<div class="author-avatar">&#128105;</div>
+<div class="author-info">
+<span>Ay&#351;e K.</span>
+<small>El yap&#305;m&#305; tak&#305; sat&#305;c&#305;s&#305;</small>
+</div>
+</div>
+</div>
+<div class="testimonial-card">
+<div class="stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+<p>&#8220;Eskiden g&#252;nde 50 mesaja tek tek cevap veriyordum. &#350;imdi bot hallediyor, ben sadece kargoluyorum.&#8221;</p>
+<div class="author">
+<div class="author-avatar">&#128104;</div>
+<div class="author-info">
+<span>Mehmet T.</span>
+<small>Telefon aksesuar ma&#287;azas&#305;</small>
+</div>
+</div>
+</div>
+<div class="testimonial-card">
+<div class="stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+<p>&#8220;Kurulum &#231;ok kolayd&#305;, 1 g&#252;nde haz&#305;rd&#305;. Sat&#305;&#351;lar&#305;m ilk hafta %40 artt&#305;.&#8221;</p>
+<div class="author">
+<div class="author-avatar">&#128105;</div>
+<div class="author-info">
+<span>Zeynep A.</span>
+<small>Kozmetik sat&#305;c&#305;s&#305;</small>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+<div class="cta-box">
+<h2>Bug&#252;n Gelen &#304;lk Mesajdan<br>Sat&#305;&#351; Yapmaya Ba&#351;la</h2>
+<p class="cta-sub">Sat&#305;&#351; ka&#231;&#305;rmay&#305; b&#305;rak. Botu kur, m&#252;&#351;terilerin otomatik cevap als&#305;n.</p>
+<div class="cta-actions">
+<a href="https://wa.me/905551234567?text=Merhaba%20siteyi%20inceledim%2C%20botu%20kurmak%20istiyorum" class="btn btn-whatsapp btn-lg btn-pulse">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.387 0-4.592-.826-6.326-2.207l-.372-.296-2.647.888.888-2.647-.296-.372A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+Bug&#252;n Kurulumu Ba&#351;lat
+</a>
+</div>
+<div class="hero-urgency" style="margin-top:1.25rem">
+<p>&#9889; S&#305;n&#305;rl&#305; say&#305;da kurulum al&#305;yoruz (g&#252;nde 3 m&#252;&#351;teri)</p>
+</div>
+<div style="margin-top:.75rem;position:relative">
+<p style="font-size:.8rem;color:var(--green);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px">&#9989; 5 g&#252;n i&#231;inde memnun kalmazsan para iadesi</p>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<p>&copy; 2025 Msgloom. T&#252;m haklar&#305; sakl&#305;d&#305;r.</p>
+</footer>
+<!-- JavaScript -->
+<script>
+const responses = {
+  urunler: {
+    bot: "&#304;&#351;te pop&#252;ler &#252;r&#252;nlerimiz: \n\n&#128092; Siyah Deri &#199;anta - 450 TL\n&#128094; Beyaz Spor Ayakkab&#305; - 899 TL\n&#128085; Oversize T-Shirt - 249 TL\n\nHangisini incelemek istersiniz?",
+    buttons: [
+      {text: "Siyah &#199;anta", action: "canta"},
+      {text: "Spor Ayakkab&#305;", action: "ayakkabi"},
+      {text: "T-Shirt", action: "tshirt"}
+    ]
+  },
+  fiyat: {
+    bot: "Fiyatlar&#305;m&#305;z &#231;ok uygun! &#128176;\n\n&#128092; &#199;antalar: 350-650 TL\n&#128094; Ayakkab&#305;lar: 699-1.299 TL\n&#128085; K&#305;yafetler: 149-499 TL\n\n&#350;u an al&#305;&#351;veri&#351; yapana %10 indirim!",
+    buttons: [
+      {text: "&#304;ndirimli Al", action: "siparis"},
+      {text: "&#220;r&#252;nleri G&#246;r", action: "urunler"}
+    ]
+  },
+  kargo: {
+    bot: "&#128666; Kargo Bilgileri:\n\n&#9989; 500 TL &#252;zeri &#220;CRETS&#304;Z kargo\n&#128197; Teslimat: 1-3 i&#351; g&#252;n&#252;\n&#128230; Ayn&#305; g&#252;n kargo (14:00&#8217;a kadar)\n\nSipari&#351; vermek ister misiniz?",
+    buttons: [
+      {text: "Sipari&#351; Ver", action: "siparis"},
+      {text: "&#220;r&#252;nleri G&#246;r", action: "urunler"}
+    ]
+  },
+  siparis: {
+    bot: "Harika se&#231;im! &#127881;\n\n<span class='discount-badge'>&#127381; %10 &#304;ND&#304;R&#304;M</span>\n\n&#350;imdi sipari&#351; verirseniz %10 indirim kazan&#305;rs&#305;n&#305;z!\n<span class='urgency-text'>&#9200; Bu teklif 30 dakika ge&#231;erli</span>\n\nSipari&#351;inizi tamamlamak i&#231;in ad&#305;n&#305;z&#305; ve adresinizi yaz&#305;n.",
+    buttons: [
+      {text: "Sipari&#351;i Onayla", action: "onay"},
+      {text: "Ba&#351;a D&#246;n", action: "reset"}
+    ]
+  },
+  canta: {
+    bot: "&#128092; Siyah Deri &#199;anta\n\n&#128178; Fiyat: 450 TL\n&#128178; &#304;ndirimli: 405 TL (%10)\n&#128207; Ger&#231;ek deri, el yap&#305;m&#305;\n&#128230; &#220;cretsiz kargo\n\n<span class='urgency-text'>&#9200; Son 3 adet stokta!</span>",
+    buttons: [
+      {text: "Hemen Al - 405 TL", action: "siparis"},
+      {text: "Di&#287;er &#220;r&#252;nler", action: "urunler"}
+    ]
+  },
+  ayakkabi: {
+    bot: "&#128094; Beyaz Spor Ayakkab&#305;\n\n&#128178; Fiyat: 899 TL\n&#128178; &#304;ndirimli: 809 TL (%10)\n&#128207; 38-44 numara mevcut\n&#128230; &#220;cretsiz kargo\n\n<span class='urgency-text'>&#9200; Bug&#252;n sipari&#351;e &#246;zel fiyat!</span>",
+    buttons: [
+      {text: "Hemen Al - 809 TL", action: "siparis"},
+      {text: "Di&#287;er &#220;r&#252;nler", action: "urunler"}
+    ]
+  },
+  tshirt: {
+    bot: "&#128085; Oversize T-Shirt\n\n&#128178; Fiyat: 249 TL\n&#128178; &#304;ndirimli: 224 TL (%10)\n&#128207; S-XL beden, 5 renk\n&#128230; 500 TL &#252;zeri &#252;cretsiz kargo\n\n<span class='discount-badge'>2 al 1 &#246;de kampanyas&#305;!</span>",
+    buttons: [
+      {text: "Hemen Al - 224 TL", action: "siparis"},
+      {text: "Di&#287;er &#220;r&#252;nler", action: "urunler"}
+    ]
+  },
+  onay: {
+    bot: "&#9989; Sipari&#351;iniz al&#305;nd&#305;!\n\nSipari&#351; numaran&#305;z: #MSL-2847\n&#128666; Yar&#305;n kargoya verilecek.\n\nTe&#351;ekk&#252;rler! &#128522;\n\n&#128172; Sorular&#305;n&#305;z i&#231;in her zaman buraday&#305;z.",
+    buttons: [
+      {text: "Ba&#351;a D&#246;n", action: "reset"}
+    ]
+  },
+  reset: {
+    bot: "Merhaba! &#128075; Ben sat&#305;&#351; asistan&#305;n&#305;z. Size nas&#305;l yard&#305;mc&#305; olabilirim?",
+    buttons: [
+      {text: "&#220;r&#252;nleri G&#246;r", action: "urunler"},
+      {text: "Fiyat Bilgisi", action: "fiyat"},
+      {text: "Kargo Bilgisi", action: "kargo"},
+      {text: "Sipari&#351; Ver", action: "siparis"}
+    ]
+  }
+};
+
+function sendMsg(action) {
+  const chatArea = document.getElementById('chatArea');
+  const chatButtons = document.getElementById('chatButtons');
+  const data = responses[action];
+  if (!data) return;
+
+  // User message
+  const btnEl = event.target;
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = btnEl.textContent;
+  chatArea.appendChild(userMsg);
+
+  // Clear buttons
+  chatButtons.innerHTML = '';
+
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'typing-indicator';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  chatArea.appendChild(typing);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    // Bot response
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    botMsg.innerHTML = data.bot.replace(/\n/g, '<br>');
+    chatArea.appendChild(botMsg);
+
+    // New buttons
+    data.buttons.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = 'chat-btn';
+      btn.innerHTML = b.text;
+      btn.onclick = () => sendMsg(b.action);
+      chatButtons.appendChild(btn);
+    });
+
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }, 800);
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({behavior: 'smooth'});
+  });
+});
+</script>
+</body>
+</html>
