@@ -17,12 +17,12 @@ export async function POST(request) {
     if (password === 'msgloom2026') {
       const token = jwt.sign({ role: 'admin' }, ADMIN_SECRET, { expiresIn: '24h' });
       const cookie = `admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
-      return Response.json({ success: true }, {
+      return Response.json({ success: true, v: 3 }, {
         headers: { 'Set-Cookie': cookie }
       });
     }
 
-    return Response.json({ error: 'Hatalı şifre' }, { status: 401 });
+    return Response.json({ error: 'Hatalı şifre', v: 3, received: password.length }, { status: 401 });
   } catch (error) {
     return Response.json({ error: 'Sunucu hatası: ' + error.message }, { status: 500 });
   }
