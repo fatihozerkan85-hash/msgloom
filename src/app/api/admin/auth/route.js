@@ -1,26 +1,26 @@
 import jwt from 'jsonwebtoken';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'msgloom2026';
 const ADMIN_SECRET = process.env.JWT_SECRET || 'msgloom-secret-key-change-this';
 
 export async function POST(request) {
   try {
     const { password } = await request.json();
+    const adminPass = process.env.ADMIN_PASSWORD || 'msgloom2026';
 
-    if (password !== ADMIN_PASSWORD) {
+    if (!password || password !== adminPass) {
       return Response.json({ error: 'Hatalı şifre' }, { status: 401 });
     }
 
-    const token = jwt.sign({ role: 'admin' }, ADMIN_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ role: 'admin', iat: Date.now() }, ADMIN_SECRET, { expiresIn: '24h' });
+
+    const cookie = `admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
 
     return Response.json({ success: true }, {
-      headers: {
-        'Set-Cookie': `admin_token=${token}; Path=/admin; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`
-      }
+      headers: { 'Set-Cookie': cookie }
     });
   } catch (error) {
     console.error('Admin auth error:', error);
-    return Response.json({ error: 'Sunucu hatası' }, { status: 500 });
+    return Response.json({ error: 'Sunucu hatası: ' + error.message }, { status: 500 });
   }
 }
 

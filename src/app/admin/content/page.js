@@ -28,7 +28,7 @@ export default function AdminContentPage() {
   }, [router]);
 
   const handleLogout = async () => {
-    document.cookie = 'admin_token=; Path=/admin; Max-Age=0';
+    document.cookie = 'admin_token=; Path=/; Max-Age=0';
     router.push('/admin/login');
   };
 

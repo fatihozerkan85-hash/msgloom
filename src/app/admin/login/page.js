@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageSquare, Shield, Loader2 } from 'lucide-react';
 
-const ADMIN_PASSWORD = 'msgloom2026';
-
 export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
