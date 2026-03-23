@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { MessageSquare, Inbox, Send } from 'lucide-react';
 
 export default function Messages() {
   const [messages, setMessages] = useState([]);
@@ -13,7 +14,7 @@ export default function Messages() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>;
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
 
   return (
     <div>
@@ -24,7 +25,9 @@ export default function Messages() {
 
       {messages.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <div className="text-5xl mb-4">💬</div>
+          <div className="flex justify-center mb-4">
+            <MessageSquare className="w-12 h-12 text-gray-300" strokeWidth={1.5} />
+          </div>
           <h3 className="font-bold text-gray-900 mb-2">Henüz mesaj yok</h3>
           <p className="text-gray-500 text-sm">İlk mesajınızı gönderin veya müşterilerinizden mesaj bekleyin.</p>
         </div>
@@ -44,9 +47,9 @@ export default function Messages() {
                 <tr key={msg.id} className="hover:bg-gray-50 transition">
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
-                      msg.direction === 'incoming' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+                      msg.direction === 'incoming' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'
                     }`}>
-                      {msg.direction === 'incoming' ? '📥 Gelen' : '📤 Giden'}
+                      {msg.direction === 'incoming' ? <><Inbox className="w-3 h-3" strokeWidth={1.5} /> Gelen</> : <><Send className="w-3 h-3" strokeWidth={1.5} /> Giden</>}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{msg.phone}</td>

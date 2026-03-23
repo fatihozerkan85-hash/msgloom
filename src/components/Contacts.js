@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Users, User } from 'lucide-react';
 
 export default function Contacts() {
   const [contacts, setContacts] = useState([]);
@@ -13,7 +14,7 @@ export default function Contacts() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>;
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
 
   return (
     <div>
@@ -24,7 +25,9 @@ export default function Contacts() {
 
       {contacts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <div className="text-5xl mb-4">👥</div>
+          <div className="flex justify-center mb-4">
+            <Users className="w-12 h-12 text-gray-300" strokeWidth={1.5} />
+          </div>
           <h3 className="font-bold text-gray-900 mb-2">Henüz kişi yok</h3>
           <p className="text-gray-500 text-sm">Mesaj gönderdiğinizde veya aldığınızda kişiler otomatik olarak burada görünecek.</p>
         </div>
@@ -33,8 +36,8 @@ export default function Contacts() {
           {contacts.map((contact) => (
             <div key={contact.phone} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold text-lg">
-                  {contact.phone.slice(-2)}
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-700">
+                  <User className="w-5 h-5" strokeWidth={1.5} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">{contact.phone}</p>

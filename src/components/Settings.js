@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { MessageSquare, Smartphone, Plus, Bot } from 'lucide-react';
 
 export default function Settings({ user }) {
   const [accounts, setAccounts] = useState([]);
@@ -44,7 +45,7 @@ export default function Settings({ user }) {
       </div>
 
       {status && (
-        <div className={`mb-6 p-4 rounded-xl text-sm ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+        <div className={`mb-6 p-4 rounded-xl text-sm ${status.type === 'success' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
           {status.text}
         </div>
       )}
@@ -67,7 +68,7 @@ export default function Settings({ user }) {
           </div>
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-500 mb-1">Plan</p>
-            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span>
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span>
           </div>
         </div>
       </div>
@@ -80,8 +81,8 @@ export default function Settings({ user }) {
             <p className="text-xs text-gray-500 mt-0.5">WhatsApp Business API hesaplarınızı yönetin</p>
           </div>
           <button onClick={() => setShowForm(!showForm)}
-            className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition">
-            + Hesap Ekle
+            className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition flex items-center gap-1.5">
+            <Plus className="w-4 h-4" strokeWidth={1.5} /> Hesap Ekle
           </button>
         </div>
 
@@ -90,13 +91,15 @@ export default function Settings({ user }) {
             {accounts.map(acc => (
               <div key={acc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700">💬</div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700">
+                    <MessageSquare className="w-4 h-4" strokeWidth={1.5} />
+                  </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{acc.phone_number || acc.phone_number_id}</p>
                     <p className="text-xs text-gray-500">ID: {acc.phone_number_id}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
                   {acc.is_active ? 'Aktif' : 'Pasif'}
                 </span>
               </div>
@@ -104,7 +107,7 @@ export default function Settings({ user }) {
           </div>
         ) : (
           <div className="bg-gray-50 rounded-xl p-8 text-center mb-4">
-            <div className="text-4xl mb-2">📱</div>
+            <Smartphone className="w-10 h-10 text-gray-300 mx-auto mb-2" strokeWidth={1.5} />
             <p className="text-gray-500 text-sm">Henüz WhatsApp hesabı eklenmemiş</p>
           </div>
         )}
@@ -113,16 +116,16 @@ export default function Settings({ user }) {
           <form onSubmit={handleAdd} className="border-t border-gray-100 pt-4 space-y-3">
             <div className="grid md:grid-cols-2 gap-3">
               <input type="text" placeholder="Phone Number ID *" value={form.phone_number_id} onChange={update('phone_number_id')}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" required />
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
               <input type="text" placeholder="Business Account ID" value={form.business_account_id} onChange={update('business_account_id')}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" />
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
             </div>
             <input type="text" placeholder="Access Token *" value={form.access_token} onChange={update('access_token')}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" required />
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
             <input type="text" placeholder="Telefon Numarası (opsiyonel)" value={form.phone_number} onChange={update('phone_number')}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" />
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
             <div className="flex gap-3">
-              <button type="submit" className="bg-green-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-green-700 transition">Kaydet</button>
+              <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition">Kaydet</button>
               <button type="button" onClick={() => setShowForm(false)} className="text-gray-500 px-6 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition">İptal</button>
             </div>
           </form>
@@ -132,9 +135,12 @@ export default function Settings({ user }) {
       {/* Telegram (yakında) */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 opacity-60">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-gray-900">Telegram Bot</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Telegram bot entegrasyonu</p>
+          <div className="flex items-center gap-3">
+            <Bot className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+            <div>
+              <h3 className="font-bold text-gray-900">Telegram Bot</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Telegram bot entegrasyonu</p>
+            </div>
           </div>
           <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-medium">Yakında</span>
         </div>
