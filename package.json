@@ -11,6 +11,7 @@
     "@neondatabase/serverless": "^0.10.0",
     "axios": "^1.7.2",
     "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.38.0",
     "jsonwebtoken": "^9.0.3",
     "next": "^15.0.0",
     "next-auth": "^4.24.13",
