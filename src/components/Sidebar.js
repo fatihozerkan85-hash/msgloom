@@ -1,12 +1,13 @@
 'use client';
 
-import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut, FileText } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { id: 'messages', label: 'Mesajlar', Icon: MessageSquare },
   { id: 'send', label: 'Mesaj Gönder', Icon: Send },
   { id: 'contacts', label: 'Kişiler', Icon: Users },
+  { id: 'content', label: 'İçerik Yönetimi', Icon: FileText },
   { id: 'settings', label: 'Ayarlar', Icon: Settings },
 ];
 

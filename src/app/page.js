@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, FloatingCard, SlideInCard, PulseGlow } from '@/components/AnimatedSection';
 import LiveDemoSection from '@/components/ChatMockup';
+import { useContent, t } from '@/lib/useContent';
 import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, UserPlus, TrendingUp, Rocket, Clock, CheckCircle, ArrowRight, MessageCircle } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
+  const { content: c } = useContent();
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -33,18 +35,18 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.05 }}>
             <MessageSquare className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
-            <span className="text-xl font-bold text-gray-900">MsgLoom</span>
+            <span className="text-xl font-bold text-gray-900">{t(c,'navbar','brand')}</span>
           </motion.div>
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
-            <a href="#features" className="hover:text-blue-600 transition">Özellikler</a>
-            <a href="#benefits" className="hover:text-blue-600 transition">Avantajlar</a>
-            <a href="#contact" className="hover:text-blue-600 transition">İletişim</a>
+            <a href="#features" className="hover:text-blue-600 transition">{t(c,'navbar','link1')}</a>
+            <a href="#benefits" className="hover:text-blue-600 transition">{t(c,'navbar','link2')}</a>
+            <a href="#contact" className="hover:text-blue-600 transition">{t(c,'navbar','link3')}</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-gray-700 hover:text-blue-600 font-medium px-4 py-2 hidden md:inline-block">Giriş Yap</Link>
+            <Link href="/login" className="text-sm text-gray-700 hover:text-blue-600 font-medium px-4 py-2 hidden md:inline-block">{t(c,'navbar','login')}</Link>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/register" className="text-sm bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition">
-                Başlayın
+                {t(c,'navbar','register')}
               </Link>
             </motion.div>
           </div>
@@ -57,24 +59,24 @@ export default function Home() {
           <div>
             <FadeIn delay={0.1}>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-                WhatsApp & Telegram<br />Mesajlaşma Yönetimi
+                {t(c,'hero','title').split('\n').map((line, i) => <span key={i}>{line}<br /></span>)}
               </h1>
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                İşletmenizin mesajlaşma süreçlerini tek platformdan yönetin, müşteri iletişimini optimize edin ve verimliliği artırın.
+                {t(c,'hero','subtitle')}
               </p>
             </FadeIn>
             <FadeIn delay={0.3}>
               <div className="flex flex-wrap gap-4">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/register" className="bg-blue-600 text-white px-7 py-3.5 rounded-lg font-medium hover:bg-blue-700 transition inline-block">
-                    Ücretsiz Deneyin
+                    {t(c,'hero','cta_primary')}
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <a href="#features" className="border border-gray-300 text-gray-700 px-7 py-3.5 rounded-lg font-medium hover:border-blue-400 hover:text-blue-600 transition inline-block">
-                    Demo İzleyin
+                    {t(c,'hero','cta_secondary')}
                   </a>
                 </motion.div>
               </div>
@@ -93,25 +95,25 @@ export default function Home() {
       <section id="features" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Güçlü Özellikler</h2>
-            <p className="text-gray-600">İşletmeniz için tasarlanmış kapsamlı mesajlaşma çözümü</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t(c,'features','title')}</h2>
+            <p className="text-gray-600">{t(c,'features','subtitle')}</p>
           </FadeIn>
           <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
             {[
               {
                 img: 'https://images.unsplash.com/photo-1760346546771-a81d986459ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                Icon: MessageSquare, title: 'Çoklu Kanal Yönetimi',
-                desc: 'WhatsApp ve Telegram hesaplarınızı tek bir platformdan yönetin. Tüm mesajlarınızı merkezi bir yerden takip edin.'
+                Icon: MessageSquare, title: t(c,'features','card1_title'),
+                desc: t(c,'features','card1_desc')
               },
               {
                 img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                Icon: BarChart3, title: 'Detaylı Analitik',
-                desc: 'Mesajlaşma metriklerinizi görselleştirin. Performans raporları ile verimliliği ölçümleyin ve optimize edin.'
+                Icon: BarChart3, title: t(c,'features','card2_title'),
+                desc: t(c,'features','card2_desc')
               },
               {
                 img: 'https://images.unsplash.com/photo-1759752393975-7ca7b302fcc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                Icon: Zap, title: 'Otomasyon',
-                desc: 'Tekrarlayan görevleri otomatikleştirin. Akıllı yanıtlar ve mesaj şablonları ile zamandan tasarruf edin.'
+                Icon: Zap, title: t(c,'features','card3_title'),
+                desc: t(c,'features','card3_desc')
               }
             ].map((f, i) => (
               <StaggerItem key={i}>
@@ -148,30 +150,30 @@ export default function Home() {
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 className="inline-flex items-center gap-2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-1.5 rounded-full mb-6"
               >
-                <TrendingUp className="w-4 h-4" strokeWidth={2} /> Satış Dönüşümü
+                <TrendingUp className="w-4 h-4" strokeWidth={2} /> {t(c,'sales','badge')}
               </motion.span>
             </FadeIn>
             <FadeIn delay={0.1}>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
-                DM&apos;den Gelen Her Mesajı<br />
+                {t(c,'sales','title')}<br />
                 <motion.span
                   animate={{ color: ['#fde047', '#fbbf24', '#fde047'] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   className="text-yellow-300"
-                >Satışa Çevirin</motion.span>
+                >{t(c,'sales','title_highlight')}</motion.span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="text-blue-100 mb-8 leading-relaxed">
-                Otomatik yanıtlar, akıllı yönlendirme ve detaylı analitik ile müşteri mesajlarınızı kaçırmayın, her fırsatı değerlendirin.
+                {t(c,'sales','description')}
               </p>
             </FadeIn>
 
             <StaggerContainer className="space-y-3 mb-8" staggerDelay={0.1}>
               {[
-                { value: '%85', label: 'Anında Yanıt', sub: 'daha hızlı cevap' },
-                { value: '%60', label: 'Dönüşüm Oranı', sub: 'artış sağlar' },
-                { value: '%95', label: 'Müşteri Memnuniyeti', sub: 'memnuniyet oranı' },
+                { value: t(c,'sales','stat1_value'), label: t(c,'sales','stat1_label'), sub: t(c,'sales','stat1_sub') },
+                { value: t(c,'sales','stat2_value'), label: t(c,'sales','stat2_label'), sub: t(c,'sales','stat2_sub') },
+                { value: t(c,'sales','stat3_value'), label: t(c,'sales','stat3_label'), sub: t(c,'sales','stat3_sub') },
               ].map((s, i) => (
                 <StaggerItem key={i}>
                   <motion.div
@@ -200,7 +202,7 @@ export default function Home() {
             <FadeIn delay={0.4}>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/register" className="inline-block border-2 border-white text-white px-7 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition">
-                  Hemen Başlayın
+                  {t(c,'sales','cta')}
                 </Link>
               </motion.div>
             </FadeIn>
@@ -284,13 +286,13 @@ export default function Home() {
           </FadeIn>
           <div>
             <FadeIn>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Neden MsgLoom?</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">{t(c,'why','title')}</h2>
             </FadeIn>
             <StaggerContainer className="space-y-6" staggerDelay={0.15}>
               {[
-                { Icon: Shield, title: 'Güvenli İletişim', desc: 'End-to-end şifreleme ile müşteri verileriniz güvende. KVKK ve GDPR uyumlu altyapı.' },
-                { Icon: Users, title: 'Ekip Yönetimi', desc: 'Çoklu kullanıcı desteği ile ekibinizi organize edin. Rol tabanlı erişim kontrolü.' },
-                { Icon: Globe, title: '7/24 Destek', desc: 'Türkçe teknik destek ekibimiz her zaman yanınızda. Hızlı çözüm, kesintisiz hizmet.' },
+                { Icon: Shield, title: t(c,'why','card1_title'), desc: t(c,'why','card1_desc') },
+                { Icon: Users, title: t(c,'why','card2_title'), desc: t(c,'why','card2_desc') },
+                { Icon: Globe, title: t(c,'why','card3_title'), desc: t(c,'why','card3_desc') },
               ].map((f, i) => (
                 <StaggerItem key={i}>
                   <motion.div whileHover={{ x: 8 }} transition={{ duration: 0.2 }} className="flex items-start gap-4 group cursor-pointer">
@@ -313,10 +315,10 @@ export default function Home() {
       <section className="py-12 px-6 bg-blue-600">
         <StaggerContainer className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center" staggerDelay={0.1}>
           {[
-            { value: '5000+', label: 'Aktif Kullanıcı' },
-            { value: '1M+', label: 'Günlük Mesaj' },
-            { value: '99.9%', label: 'Uptime' },
-            { value: '24/7', label: 'Destek' },
+            { value: t(c,'stats','stat1_value'), label: t(c,'stats','stat1_label') },
+            { value: t(c,'stats','stat2_value'), label: t(c,'stats','stat2_label') },
+            { value: t(c,'stats','stat3_value'), label: t(c,'stats','stat3_label') },
+            { value: t(c,'stats','stat4_value'), label: t(c,'stats','stat4_label') },
           ].map((s, i) => (
             <StaggerItem key={i}>
               <ScaleIn delay={i * 0.1}>
@@ -359,18 +361,18 @@ export default function Home() {
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 className="inline-flex items-center gap-2 bg-orange-500 text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6"
               >
-                <Rocket className="w-4 h-4" strokeWidth={2} /> Hızlı Başlangıç
+                <Rocket className="w-4 h-4" strokeWidth={2} /> {t(c,'setup','badge')}
               </motion.span>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">Botu Kur ve</h2>
-              <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-6">Satışa Başla</h2>
-              <p className="text-gray-600 mb-8">3 adımda kurulum tamamla, dakikalar içinde ilk müşterilerinle konuşmaya başla.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">{t(c,'setup','title')}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-6">{t(c,'setup','title_highlight')}</h2>
+              <p className="text-gray-600 mb-8">{t(c,'setup','subtitle')}</p>
             </FadeIn>
 
             <StaggerContainer className="space-y-6 mb-8" staggerDelay={0.15}>
               {[
-                { Icon: UserPlus, title: 'Hesabını Oluştur', desc: '2 dakikada kayıt ol, onay beklemeden başla' },
-                { Icon: MessageSquare, title: 'WhatsApp/Telegram Bağla', desc: 'QR kod ile anında bağlan, tek tık yeterli' },
-                { Icon: TrendingUp, title: 'Satışları İzle', desc: "Dashboard'tan tüm mesajları yönet, satış yap" },
+                { Icon: UserPlus, title: t(c,'setup','step1_title'), desc: t(c,'setup','step1_desc') },
+                { Icon: MessageSquare, title: t(c,'setup','step2_title'), desc: t(c,'setup','step2_desc') },
+                { Icon: TrendingUp, title: t(c,'setup','step3_title'), desc: t(c,'setup','step3_desc') },
               ].map((s, i) => (
                 <StaggerItem key={i}>
                   <motion.div whileHover={{ x: 8 }} transition={{ duration: 0.2 }} className="flex items-start gap-4">
@@ -399,7 +401,7 @@ export default function Home() {
                 className="bg-white rounded-2xl px-6 py-4 inline-flex items-center gap-3 shadow-md border border-gray-100"
               >
                 <Clock className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
-                <p className="text-base text-gray-700">Ortalama kurulum süresi sadece <span className="font-extrabold text-gray-900 text-lg">5 dakika</span></p>
+                <p className="text-base text-gray-700">{t(c,'setup','timer')} <span className="font-extrabold text-gray-900 text-lg">{t(c,'setup','timer_bold')}</span></p>
               </motion.div>
             </FadeIn>
           </div>
@@ -412,21 +414,21 @@ export default function Home() {
           <div>
             <FadeIn>
               <span className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-                <CheckCircle className="w-4 h-4 text-green-600" strokeWidth={1.5} /> %100 Garanti
+                <CheckCircle className="w-4 h-4 text-green-600" strokeWidth={1.5} /> {t(c,'guarantee','badge')}
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">5 Gün Kullanın,</h2>
-              <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-6 leading-tight">Beğenmezseniz Paranızı İade Edelim</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">{t(c,'guarantee','title')}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-6 leading-tight">{t(c,'guarantee','title_highlight')}</h2>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                Ürünümüze güveniyoruz. Eğer 5 gün içinde memnun kalmazsanız, hiçbir soru sormadan paranızı iade ediyoruz.
+                {t(c,'guarantee','description')}
               </p>
             </FadeIn>
 
             <StaggerContainer className="space-y-3 mb-8" staggerDelay={0.1}>
               {[
-                'Soru sormadan tam iade',
-                'Otomatik iade işlemi',
-                'Kredi kartına 24 saat içinde iade',
-                'Taahhüt yok, ceza yok',
+                t(c,'guarantee','item1'),
+                t(c,'guarantee','item2'),
+                t(c,'guarantee','item3'),
+                t(c,'guarantee','item4'),
               ].map((item, i) => (
                 <StaggerItem key={i}>
                   <motion.div whileHover={{ x: 6 }} className="flex items-center gap-3 cursor-pointer">
@@ -447,11 +449,11 @@ export default function Home() {
                     <Shield className="w-5 h-5 text-green-600" strokeWidth={1.5} />
                   </span>
                   <div>
-                    <p className="font-bold text-gray-900">%100 Güvenli</p>
-                    <p className="text-xs text-gray-500">Risksiz deneme garantisi</p>
+                    <p className="font-bold text-gray-900">{t(c,'guarantee','trust_title')}</p>
+                    <p className="text-xs text-gray-500">{t(c,'guarantee','trust_sub')}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">5,000+ mutlu müşterimiz var ve <span className="font-bold">%98</span>&apos;i ürünü kullanmaya devam ediyor.</p>
+                <p className="text-sm text-gray-600">{t(c,'guarantee','trust_desc')}</p>
               </motion.div>
             </ScaleIn>
           </div>
@@ -493,17 +495,17 @@ export default function Home() {
       {/* CTA */}
       <section className="py-20 px-6 bg-gray-900">
         <FadeIn className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Mesajlaşma Yönetiminizi Bir Üst Seviyeye Taşıyın</h2>
-          <p className="text-gray-400 text-lg mb-8">14 gün ücretsiz deneme ile hemen başlayın. Kredi kartı gerektirmez.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t(c,'cta','title')}</h2>
+          <p className="text-gray-400 text-lg mb-8">{t(c,'cta','subtitle')}</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/register" className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-medium hover:bg-blue-700 transition inline-block">
-                Ücretsiz Başlayın
+                {t(c,'cta','cta_primary')}
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <a href="#" className="border border-gray-600 text-gray-300 px-8 py-3.5 rounded-lg font-medium hover:border-blue-400 hover:text-blue-400 transition inline-block">
-                Fiyatları İnceleyin
+                {t(c,'cta','cta_secondary')}
               </a>
             </motion.div>
           </div>
