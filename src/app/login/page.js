@@ -31,7 +31,7 @@ export default function LoginPage() {
       {/* Left - Form */}
       <div className="flex-1 flex items-center justify-center px-8">
         <div className="w-full max-w-md">
-          <Link href="/" className="text-2xl font-bold text-green-600 mb-2 inline-block">MsgLoom</Link>
+          <Link href="/" className="text-2xl font-bold text-blue-600 mb-2 inline-block">MsgLoom</Link>
           <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Tekrar hoş geldiniz</h2>
           <p className="text-gray-500 mb-8">Hesabınıza giriş yapın</p>
 
@@ -39,33 +39,33 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email adresi</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none transition" placeholder="ornek@sirket.com" required />
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition" placeholder="ornek@sirket.com" required />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Şifre</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none transition" placeholder="••••••••" required />
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition" placeholder="••••••••" required />
             </div>
 
             {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl">{error}</div>}
 
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 transition shadow-sm">
+              className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 transition shadow-sm">
               {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Hesabınız yok mu? <Link href="/register" className="text-green-600 font-medium hover:underline">Ücretsiz kayıt olun</Link>
+            Hesabınız yok mu? <Link href="/register" className="text-blue-600 font-medium hover:underline">Ücretsiz kayıt olun</Link>
           </p>
         </div>
       </div>
 
       {/* Right - Visual */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-green-500 to-green-700 items-center justify-center p-12">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-500 to-blue-700 items-center justify-center p-12">
         <div className="text-white max-w-md">
           <h3 className="text-3xl font-bold mb-4">Mesajlaşmayı güçlendirin</h3>
-          <p className="text-green-100 text-lg mb-8">WhatsApp ve Telegram üzerinden müşterilerinize tek panelden ulaşın.</p>
+          <p className="text-blue-100 text-lg mb-8">WhatsApp ve Telegram üzerinden müşterilerinize tek panelden ulaşın.</p>
           <div className="space-y-4">
             {['Resmi WhatsApp Business API', 'Toplu mesaj gönderimi', 'Detaylı analitik ve raporlama', 'Güvenli ve ölçeklenebilir'].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
