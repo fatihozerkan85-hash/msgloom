@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, FloatingCard } from '@/components/AnimatedSection';
+import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, UserPlus, TrendingUp, Rocket, Clock, CheckCircle, ChevronRight, ArrowRight, MessageCircle } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="text-blue-600 text-xl">💬</span>
+            <MessageSquare className="w-6 h-6 text-blue-600" />
             <span className="text-xl font-bold text-gray-900">MsgLoom</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
@@ -92,17 +93,17 @@ export default function Home() {
             {[
               {
                 img: 'https://images.unsplash.com/photo-1760346546771-a81d986459ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                icon: '💬', title: 'Çoklu Kanal Yönetimi',
+                Icon: MessageSquare, title: 'Çoklu Kanal Yönetimi',
                 desc: 'WhatsApp ve Telegram hesaplarınızı tek bir platformdan yönetin. Tüm mesajlarınızı merkezi bir yerden takip edin.'
               },
               {
                 img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                icon: '📊', title: 'Detaylı Analitik',
+                Icon: BarChart3, title: 'Detaylı Analitik',
                 desc: 'Mesajlaşma metriklerinizi görselleştirin. Performans raporları ile verimliliği ölçümleyin ve optimize edin.'
               },
               {
                 img: 'https://images.unsplash.com/photo-1759752393975-7ca7b302fcc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
-                icon: '⚡', title: 'Otomasyon',
+                Icon: Zap, title: 'Otomasyon',
                 desc: 'Tekrarlayan görevleri otomatikleştirin. Akıllı yanıtlar ve mesaj şablonları ile zamandan tasarruf edin.'
               }
             ].map((f, i) => (
@@ -115,7 +116,7 @@ export default function Home() {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-blue-600">{f.icon}</span>
+                      <f.Icon className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
                       <h3 className="font-bold text-gray-900">{f.title}</h3>
                     </div>
                     <p className="text-gray-600 text-sm leading-relaxed">{f.desc}</p>
@@ -127,13 +128,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sales Conversion - Blue background */}
+      {/* Sales Conversion */}
       <section id="benefits" className="py-20 px-6 bg-blue-600">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <FadeIn>
               <span className="inline-flex items-center gap-2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-                📈 Satış Dönüşümü
+                <TrendingUp className="w-4 h-4" strokeWidth={2} /> Satış Dönüşümü
               </span>
             </FadeIn>
             <FadeIn delay={0.1}>
@@ -164,7 +165,7 @@ export default function Home() {
                         <p className="text-blue-200 text-xs">{s.sub}</p>
                       </div>
                     </div>
-                    <span className="text-blue-200">→</span>
+                    <ArrowRight className="w-4 h-4 text-blue-200" />
                   </motion.div>
                 </StaggerItem>
               ))}
@@ -183,7 +184,9 @@ export default function Home() {
                 alt="Sales Growth" className="rounded-2xl w-full" />
               <FloatingCard className="absolute top-4 right-4 bg-white rounded-xl shadow-lg p-4 max-w-[220px]" delay={0.5}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">💬</span>
+                  <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white">
+                    <MessageCircle className="w-4 h-4" />
+                  </span>
                   <div>
                     <p className="text-xs font-bold text-gray-900">Yeni Mesaj</p>
                     <p className="text-xs text-gray-500">WhatsApp</p>
@@ -192,7 +195,7 @@ export default function Home() {
                 <p className="text-xs text-gray-600">"Ürününüz hakkında bilgi alabilir miyim?"</p>
               </FloatingCard>
               <FloatingCard className="absolute bottom-4 right-4 bg-green-500 rounded-xl shadow-lg p-4 text-white" delay={0.8}>
-                <p className="text-xs font-medium flex items-center gap-1">📈 Satış Tamamlandı!</p>
+                <p className="text-xs font-medium flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Satış Tamamlandı!</p>
                 <p className="text-2xl font-bold">₺2,450</p>
                 <p className="text-xs text-green-100">+%35 bu hafta</p>
               </FloatingCard>
@@ -216,13 +219,13 @@ export default function Home() {
             </FadeIn>
             <StaggerContainer className="space-y-6" staggerDelay={0.15}>
               {[
-                { icon: '🔒', title: 'Güvenli İletişim', desc: 'End-to-end şifreleme ile müşteri verileriniz güvende. KVKK ve GDPR uyumlu altyapı.' },
-                { icon: '👥', title: 'Ekip Yönetimi', desc: 'Çoklu kullanıcı desteği ile ekibinizi organize edin. Rol tabanlı erişim kontrolü.' },
-                { icon: '🌐', title: '7/24 Destek', desc: 'Türkçe teknik destek ekibimiz her zaman yanınızda. Hızlı çözüm, kesintisiz hizmet.' },
+                { Icon: Shield, title: 'Güvenli İletişim', desc: 'End-to-end şifreleme ile müşteri verileriniz güvende. KVKK ve GDPR uyumlu altyapı.' },
+                { Icon: Users, title: 'Ekip Yönetimi', desc: 'Çoklu kullanıcı desteği ile ekibinizi organize edin. Rol tabanlı erişim kontrolü.' },
+                { Icon: Globe, title: '7/24 Destek', desc: 'Türkçe teknik destek ekibimiz her zaman yanınızda. Hızlı çözüm, kesintisiz hizmet.' },
               ].map((f, i) => (
                 <StaggerItem key={i}>
                   <motion.div whileHover={{ x: 8 }} transition={{ duration: 0.2 }} className="flex items-start gap-4">
-                    <span className="text-blue-600 text-xl mt-1">{f.icon}</span>
+                    <f.Icon className="w-6 h-6 text-blue-600 mt-0.5 shrink-0" strokeWidth={1.5} />
                     <div>
                       <h3 className="font-bold text-gray-900 mb-1">{f.title}</h3>
                       <p className="text-gray-600 text-sm leading-relaxed">{f.desc}</p>
@@ -266,7 +269,7 @@ export default function Home() {
           <div>
             <FadeIn>
               <span className="inline-flex items-center gap-2 bg-orange-500 text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-                🚀 Hızlı Başlangıç
+                <Rocket className="w-4 h-4" strokeWidth={2} /> Hızlı Başlangıç
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">Botu Kur ve</h2>
               <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-6">Satışa Başla</h2>
@@ -275,9 +278,9 @@ export default function Home() {
 
             <StaggerContainer className="space-y-6 mb-8" staggerDelay={0.15}>
               {[
-                { icon: '👤', title: 'Hesabını Oluştur', desc: '2 dakikada kayıt ol, onay beklemeden başla' },
-                { icon: '💬', title: 'WhatsApp/Telegram Bağla', desc: 'QR kod ile anında bağlan, tek tık yeterli' },
-                { icon: '📈', title: 'Satışları İzle', desc: "Dashboard'tan tüm mesajları yönet, satış yap" },
+                { Icon: UserPlus, title: 'Hesabını Oluştur', desc: '2 dakikada kayıt ol, onay beklemeden başla' },
+                { Icon: MessageSquare, title: 'WhatsApp/Telegram Bağla', desc: 'QR kod ile anında bağlan, tek tık yeterli' },
+                { Icon: TrendingUp, title: 'Satışları İzle', desc: "Dashboard'tan tüm mesajları yönet, satış yap" },
               ].map((s, i) => (
                 <StaggerItem key={i}>
                   <motion.div whileHover={{ x: 8 }} transition={{ duration: 0.2 }} className="flex items-start gap-4">
@@ -287,7 +290,7 @@ export default function Home() {
                     >{i + 1}</motion.div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-orange-500">{s.icon}</span>
+                        <s.Icon className="w-4 h-4 text-orange-500" strokeWidth={1.5} />
                         <h3 className="font-bold text-gray-900">{s.title}</h3>
                       </div>
                       <p className="text-sm text-gray-600 mt-0.5">{s.desc}</p>
@@ -299,7 +302,7 @@ export default function Home() {
 
             <FadeIn delay={0.5}>
               <div className="bg-gray-50 rounded-xl px-5 py-3 inline-flex items-center gap-2">
-                <span className="text-gray-500">⏱</span>
+                <Clock className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
                 <p className="text-sm text-gray-700">Ortalama kurulum süresi sadece <span className="font-bold">5 dakika</span></p>
               </div>
             </FadeIn>
@@ -313,7 +316,7 @@ export default function Home() {
           <div>
             <FadeIn>
               <span className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-                ✅ %100 Garanti
+                <CheckCircle className="w-4 h-4 text-green-600" strokeWidth={1.5} /> %100 Garanti
               </span>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">5 Gün Kullanın,</h2>
               <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-6 leading-tight">Beğenmezseniz Paranızı İade Edelim</h2>
@@ -332,8 +335,9 @@ export default function Home() {
                 <StaggerItem key={i}>
                   <div className="flex items-center gap-3">
                     <motion.span initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }}
-                      transition={{ delay: i * 0.1, type: 'spring', stiffness: 200 }}
-                      className="text-green-500 text-lg">✓</motion.span>
+                      transition={{ delay: i * 0.1, type: 'spring', stiffness: 200 }}>
+                      <CheckCircle className="w-5 h-5 text-green-500" strokeWidth={1.5} />
+                    </motion.span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 </StaggerItem>
@@ -343,13 +347,15 @@ export default function Home() {
             <ScaleIn delay={0.3}>
               <div className="bg-white rounded-2xl p-5 border border-gray-100 inline-block">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-lg">🛡️</span>
+                  <span className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-green-600" strokeWidth={1.5} />
+                  </span>
                   <div>
                     <p className="font-bold text-gray-900">%100 Güvenli</p>
                     <p className="text-xs text-gray-500">Risksiz deneme garantisi</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">5,000+ mutlu müşterimiz var ve <span className="font-bold">%98</span>'i ürünü kullanmaya devam ediyor.</p>
+                <p className="text-sm text-gray-600">5,000+ mutlu müşterimiz var ve <span className="font-bold">%98</span>&apos;i ürünü kullanmaya devam ediyor.</p>
               </div>
             </ScaleIn>
           </div>
@@ -360,7 +366,7 @@ export default function Home() {
                 alt="Trust Guarantee" className="rounded-2xl shadow-xl w-full" />
               <FloatingCard className="absolute bottom-6 left-6 bg-white rounded-xl shadow-lg p-4 max-w-[250px]" delay={0.5}>
                 <div className="flex gap-0.5 text-yellow-400 mb-2">★ ★ ★ ★ ★</div>
-                <p className="text-xs text-gray-600 italic mb-2">"İlk günden satışlarım arttı. Kesinlikle denemeye değer!"</p>
+                <p className="text-xs text-gray-600 italic mb-2">&quot;İlk günden satışlarım arttı. Kesinlikle denemeye değer!&quot;</p>
                 <p className="text-xs text-gray-400">- Ahmet K., E-ticaret</p>
               </FloatingCard>
             </div>
@@ -394,7 +400,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-blue-400">💬</span>
+                <MessageSquare className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
                 <span className="text-lg font-bold text-white">MsgLoom</span>
               </div>
               <p className="text-sm leading-relaxed">WhatsApp & Telegram mesajlaşma yönetiminde güvenilir çözüm ortağınız.</p>
