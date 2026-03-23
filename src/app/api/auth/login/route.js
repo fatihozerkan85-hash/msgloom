@@ -1,0 +1,34 @@
+import { neon } from '@neondatabase/serverless';
+import { verifyPassword, createToken } from '@/lib/auth';
+
+export async function POST(request) {
+  try {
+    const { email, password } = await request.json();
+
+    if (!email || !password) {
+      return Response.json({ error: 'Email ve şifre gerekli' }, { status: 400 });
+    }
+
+    const sql = neon(process.env.POSTGRES_URL);
+    const [user] = await sql`SELECT * FROM users WHERE email = ${email}`;
+
+    if (!user) {
+      return Response.json({ error: 'Email veya şifre hatalı' }, { status: 401 });
+    }
+
+    const valid = await verifyPassword(password, user.password_hash);
+    if (!valid) {
+      return Response.json({ error: 'Email veya şifre hatalı' }, { status: 401 });
+    }
+
+    const token = createToken(user);
+    const { password_hash, ...safeUser } = user;
+
+    return Response.json({ success: true, user: safeUser }, {
+      headers: { 'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}` }
+    });
+  } catch (error) {
+    console.error('Giriş hatası:', error);
+    return Response.json({ error: 'Sunucu hatası' }, { status: 500 });
+  }
+}
