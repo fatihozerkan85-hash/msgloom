@@ -4,11 +4,12 @@ const ADMIN_SECRET = process.env.JWT_SECRET || 'msgloom-secret-key-change-this';
 
 export async function POST(request) {
   try {
-    const { password } = await request.json();
-    const adminPass = process.env.ADMIN_PASSWORD || 'msgloom2026';
+    const body = await request.json();
+    const password = (body.password || '').trim();
+    const adminPass = (process.env.ADMIN_PASSWORD || 'msgloom2026').trim();
 
     if (!password || password !== adminPass) {
-      return Response.json({ error: 'Hatalı şifre' }, { status: 401 });
+      return Response.json({ error: 'Hatalı şifre', hint: `len:${password.length}/${adminPass.length}` }, { status: 401 });
     }
 
     const token = jwt.sign({ role: 'admin', iat: Date.now() }, ADMIN_SECRET, { expiresIn: '24h' });
