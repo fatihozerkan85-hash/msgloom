@@ -4,23 +4,26 @@ const ADMIN_SECRET = process.env.JWT_SECRET || 'msgloom-secret-key-change-this';
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const password = (body.password || '').trim();
-    const adminPass = (process.env.ADMIN_PASSWORD || 'msgloom2026').trim();
-
-    if (!password || password !== adminPass) {
-      return Response.json({ error: 'Hatalı şifre', hint: `len:${password.length}/${adminPass.length}` }, { status: 401 });
+    const body = await request.text();
+    let password = '';
+    try {
+      const parsed = JSON.parse(body);
+      password = String(parsed.password || '').trim();
+    } catch {
+      return Response.json({ error: 'Geçersiz istek' }, { status: 400 });
     }
 
-    const token = jwt.sign({ role: 'admin', iat: Date.now() }, ADMIN_SECRET, { expiresIn: '24h' });
+    // Şifre: msgloom2026
+    if (password === 'msgloom2026') {
+      const token = jwt.sign({ role: 'admin' }, ADMIN_SECRET, { expiresIn: '24h' });
+      const cookie = `admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
+      return Response.json({ success: true }, {
+        headers: { 'Set-Cookie': cookie }
+      });
+    }
 
-    const cookie = `admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${24 * 60 * 60}`;
-
-    return Response.json({ success: true }, {
-      headers: { 'Set-Cookie': cookie }
-    });
+    return Response.json({ error: 'Hatalı şifre' }, { status: 401 });
   } catch (error) {
-    console.error('Admin auth error:', error);
     return Response.json({ error: 'Sunucu hatası: ' + error.message }, { status: 500 });
   }
 }
