@@ -13,39 +13,45 @@ export default function Messages() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-gray-500">Yükleniyor...</p>;
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>;
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Mesajlar</h2>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Mesajlar</h2>
+        <p className="text-gray-500 text-sm mt-1">Gelen ve giden tüm mesajlarınız</p>
+      </div>
+
       {messages.length === 0 ? (
-        <p className="text-gray-500">Henüz mesaj yok.</p>
+        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+          <div className="text-5xl mb-4">💬</div>
+          <h3 className="font-bold text-gray-900 mb-2">Henüz mesaj yok</h3>
+          <p className="text-gray-500 text-sm">İlk mesajınızı gönderin veya müşterilerinizden mesaj bekleyin.</p>
+        </div>
       ) : (
-        <div className="bg-white rounded-xl shadow overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <table className="w-full text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-3 text-sm font-medium text-gray-600">Yön</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-600">Telefon</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-600">Mesaj</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-600">Tarih</th>
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Yön</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Telefon</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mesaj</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tarih</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-50">
               {messages.map((msg) => (
-                <tr key={msg.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                      msg.direction === 'incoming' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                <tr key={msg.id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                      msg.direction === 'incoming' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
                     }`}>
-                      {msg.direction === 'incoming' ? 'Gelen' : 'Giden'}
+                      {msg.direction === 'incoming' ? '📥 Gelen' : '📤 Giden'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm">{msg.phone}</td>
-                  <td className="px-4 py-3 text-sm">{msg.text_body || msg.template_name || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {new Date(msg.created_at).toLocaleString('tr-TR')}
-                  </td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{msg.phone}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{msg.text_body || msg.template_name || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-400">{new Date(msg.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>

@@ -6,6 +6,7 @@ export default function Settings({ user }) {
   const [accounts, setAccounts] = useState([]);
   const [form, setForm] = useState({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
   const [status, setStatus] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetch('/api/account/whatsapp')
@@ -26,7 +27,8 @@ export default function Settings({ user }) {
     if (data.success) {
       setAccounts([...accounts, data.account]);
       setForm({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
-      setStatus({ type: 'success', text: 'WhatsApp hesabı eklendi' });
+      setShowForm(false);
+      setStatus({ type: 'success', text: 'WhatsApp hesabı başarıyla eklendi' });
     } else {
       setStatus({ type: 'error', text: data.error });
     }
@@ -36,48 +38,106 @@ export default function Settings({ user }) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Ayarlar</h2>
-
-      <div className="bg-white rounded-xl shadow p-6 mb-6">
-        <h3 className="font-bold text-lg mb-4">Hesap Bilgileri</h3>
-        <p className="text-sm text-gray-600">Email: {user?.email}</p>
-        <p className="text-sm text-gray-600">Plan: {user?.plan}</p>
-        <p className="text-sm text-gray-600">Şirket: {user?.company || '-'}</p>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Ayarlar</h2>
+        <p className="text-gray-500 text-sm mt-1">Hesap ve entegrasyon ayarlarınız</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-6 mb-6">
-        <h3 className="font-bold text-lg mb-4">WhatsApp Hesapları</h3>
+      {status && (
+        <div className={`mb-6 p-4 rounded-xl text-sm ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+          {status.text}
+        </div>
+      )}
+
+      {/* Hesap Bilgileri */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+        <h3 className="font-bold text-gray-900 mb-4">Hesap Bilgileri</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Email</p>
+            <p className="text-sm font-medium text-gray-900">{user?.email}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Ad Soyad</p>
+            <p className="text-sm font-medium text-gray-900">{user?.name || '-'}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Şirket</p>
+            <p className="text-sm font-medium text-gray-900">{user?.company || '-'}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Plan</p>
+            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* WhatsApp Hesapları */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-bold text-gray-900">WhatsApp Hesapları</h3>
+            <p className="text-xs text-gray-500 mt-0.5">WhatsApp Business API hesaplarınızı yönetin</p>
+          </div>
+          <button onClick={() => setShowForm(!showForm)}
+            className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition">
+            + Hesap Ekle
+          </button>
+        </div>
+
         {accounts.length > 0 ? (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-3 mb-4">
             {accounts.map(acc => (
-              <div key={acc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-sm font-medium">{acc.phone_number || acc.phone_number_id}</p>
-                  <p className="text-xs text-gray-500">ID: {acc.phone_number_id}</p>
+              <div key={acc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700">💬</div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{acc.phone_number || acc.phone_number_id}</p>
+                    <p className="text-xs text-gray-500">ID: {acc.phone_number_id}</p>
+                  </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded ${acc.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                   {acc.is_active ? 'Aktif' : 'Pasif'}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm mb-4">Henüz WhatsApp hesabı eklenmemiş.</p>
+          <div className="bg-gray-50 rounded-xl p-8 text-center mb-4">
+            <div className="text-4xl mb-2">📱</div>
+            <p className="text-gray-500 text-sm">Henüz WhatsApp hesabı eklenmemiş</p>
+          </div>
         )}
 
-        <h4 className="font-medium text-sm mb-3">Yeni WhatsApp Hesabı Ekle</h4>
-        <form onSubmit={handleAdd} className="space-y-3">
-          <input type="text" placeholder="Phone Number ID" value={form.phone_number_id} onChange={update('phone_number_id')}
-            className="w-full border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" required />
-          <input type="text" placeholder="Business Account ID" value={form.business_account_id} onChange={update('business_account_id')}
-            className="w-full border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" />
-          <input type="text" placeholder="Access Token" value={form.access_token} onChange={update('access_token')}
-            className="w-full border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" required />
-          <input type="text" placeholder="Telefon Numarası (opsiyonel)" value={form.phone_number} onChange={update('phone_number')}
-            className="w-full border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none" />
-          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-green-700">Ekle</button>
-          {status && <p className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{status.text}</p>}
-        </form>
+        {showForm && (
+          <form onSubmit={handleAdd} className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="grid md:grid-cols-2 gap-3">
+              <input type="text" placeholder="Phone Number ID *" value={form.phone_number_id} onChange={update('phone_number_id')}
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" required />
+              <input type="text" placeholder="Business Account ID" value={form.business_account_id} onChange={update('business_account_id')}
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" />
+            </div>
+            <input type="text" placeholder="Access Token *" value={form.access_token} onChange={update('access_token')}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" required />
+            <input type="text" placeholder="Telefon Numarası (opsiyonel)" value={form.phone_number} onChange={update('phone_number')}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none" />
+            <div className="flex gap-3">
+              <button type="submit" className="bg-green-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-green-700 transition">Kaydet</button>
+              <button type="button" onClick={() => setShowForm(false)} className="text-gray-500 px-6 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition">İptal</button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Telegram (yakında) */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 opacity-60">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-gray-900">Telegram Bot</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Telegram bot entegrasyonu</p>
+          </div>
+          <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-medium">Yakında</span>
+        </div>
       </div>
     </div>
   );

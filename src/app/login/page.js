@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,51 +15,66 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-
     const data = await res.json();
-    if (data.success) {
-      router.push('/dashboard');
-    } else {
-      setError(data.error);
-    }
+    if (data.success) router.push('/dashboard');
+    else setError(data.error);
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center text-green-600 mb-2">MsgLoom</h1>
-        <p className="text-center text-gray-500 mb-6">Hesabınıza giriş yapın</p>
+    <div className="min-h-screen flex">
+      {/* Left - Form */}
+      <div className="flex-1 flex items-center justify-center px-8">
+        <div className="w-full max-w-md">
+          <Link href="/" className="text-2xl font-bold text-green-600 mb-2 inline-block">MsgLoom</Link>
+          <h2 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Tekrar hoş geldiniz</h2>
+          <p className="text-gray-500 mb-8">Hesabınıza giriş yapın</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" required />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email adresi</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none transition" placeholder="ornek@sirket.com" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Şifre</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:outline-none transition" placeholder="••••••••" required />
+            </div>
+
+            {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl">{error}</div>}
+
+            <button type="submit" disabled={loading}
+              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 transition shadow-sm">
+              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Hesabınız yok mu? <Link href="/register" className="text-green-600 font-medium hover:underline">Ücretsiz kayıt olun</Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Right - Visual */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-green-500 to-green-700 items-center justify-center p-12">
+        <div className="text-white max-w-md">
+          <h3 className="text-3xl font-bold mb-4">Mesajlaşmayı güçlendirin</h3>
+          <p className="text-green-100 text-lg mb-8">WhatsApp ve Telegram üzerinden müşterilerinize tek panelden ulaşın.</p>
+          <div className="space-y-4">
+            {['Resmi WhatsApp Business API', 'Toplu mesaj gönderimi', 'Detaylı analitik ve raporlama', 'Güvenli ve ölçeklenebilir'].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="bg-white/20 rounded-full p-1">✓</span>
+                <span>{item}</span>
+              </div>
+            ))}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" required />
-          </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <button type="submit" disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50">
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Hesabınız yok mu? <a href="/register" className="text-green-600 hover:underline">Kayıt Ol</a>
-        </p>
+        </div>
       </div>
     </div>
   );
