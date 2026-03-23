@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, FloatingCard, SlideInCard, PulseGlow } from '@/components/AnimatedSection';
+import LiveDemoSection from '@/components/ChatMockup';
 import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, UserPlus, TrendingUp, Rocket, Clock, CheckCircle, ArrowRight, MessageCircle } from 'lucide-react';
 
 export default function Home() {
@@ -133,6 +134,9 @@ export default function Home() {
           </StaggerContainer>
         </div>
       </section>
+
+      {/* Live Demo - Chat Mockups */}
+      <LiveDemoSection />
 
       {/* Sales Conversion */}
       <section id="benefits" className="py-20 px-6 bg-blue-600">
