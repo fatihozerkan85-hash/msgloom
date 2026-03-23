@@ -3,31 +3,36 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ContentManager from '@/components/ContentManager';
-import { MessageSquare, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { MessageSquare, LogOut, ExternalLink } from 'lucide-react';
 
 export default function AdminContentPage() {
-  const [user, setUser] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/auth/me')
+    fetch('/api/admin/auth')
       .then(res => res.json())
       .then(data => {
-        if (data.user && data.user.is_admin) {
-          setUser(data.user);
-          setLoading(false);
-        } else if (data.user) {
-          router.push('/dashboard');
+        if (data.authenticated) {
+          setAuthenticated(true);
         } else {
-          router.push('/login');
+          router.push('/admin/login');
         }
+        setLoading(false);
       })
-      .catch(() => router.push('/login'));
+      .catch(() => {
+        router.push('/admin/login');
+        setLoading(false);
+      });
   }, [router]);
 
-  if (loading) return (
+  const handleLogout = async () => {
+    document.cookie = 'admin_token=; Path=/admin; Max-Age=0';
+    router.push('/admin/login');
+  };
+
+  if (loading || !authenticated) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
@@ -37,18 +42,23 @@ export default function AdminContentPage() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition text-sm">
-              <ArrowLeft className="w-4 h-4" strokeWidth={1.5} /> Dashboard
-            </Link>
-            <div className="h-5 w-px bg-gray-200" />
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
               <span className="font-bold text-gray-900">MsgLoom</span>
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin</span>
             </div>
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin Panel</span>
           </div>
-          <p className="text-sm text-gray-500">{user?.email}</p>
+          <div className="flex items-center gap-3">
+            <a href="/" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition">
+              <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} /> Siteyi Gör
+            </a>
+            <button onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition">
+              <LogOut className="w-3.5 h-3.5" strokeWidth={1.5} /> Çıkış
+            </button>
+          </div>
         </div>
       </nav>
       <main className="max-w-5xl mx-auto px-6 py-8">

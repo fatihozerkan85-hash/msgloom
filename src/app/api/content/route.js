@@ -1,5 +1,16 @@
 import { neon } from '@neondatabase/serverless';
 import { getUser } from '@/lib/auth';
+import jwt from 'jsonwebtoken';
+
+function isAdmin(request) {
+  try {
+    const cookie = request.cookies.get('admin_token')?.value;
+    if (!cookie) return false;
+    const secret = process.env.JWT_SECRET || 'msgloom-secret-key-change-this';
+    const decoded = jwt.verify(cookie, secret);
+    return decoded.role === 'admin';
+  } catch { return false; }
+}
 
 export async function GET() {
   try {
@@ -32,8 +43,9 @@ export async function GET() {
 }
 
 export async function PUT(request) {
+  const adminOk = isAdmin(request);
   const user = await getUser(request);
-  if (!user || !user.is_admin) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+  if (!adminOk && (!user || !user.is_admin)) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
 
   try {
     const { section, key, value } = await request.json();
