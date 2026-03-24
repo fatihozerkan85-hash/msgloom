@@ -6,8 +6,7 @@ export default function PaymentPage() {
     <LegalPage
       title="Ödeme ve İade Politikası"
       sections={[
-        { title: '1. Ödeme Koşulları ve iyzico Entegrasyonu', clauseCount: 60 },
-        { title: '2. İade ve Cayma Hakkı', clauseCount: 60 },
+        { title: '1. Ödeme Koşulları ve İade — iyzico Entegrasyonu (Payment and Refund)', clauseCount: 60 },
       ]}
     />
   );
