@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-// Varsayılan değerler
 const fallback = {
   navbar: { brand: 'MsgLoom', link1: 'Özellikler', link2: 'Avantajlar', link3: 'İletişim', login: 'Giriş Yap', register: 'Başlayın' },
   hero: { title: 'WhatsApp & Telegram\nMesajlaşma Yönetimi', subtitle: 'İşletmenizin mesajlaşma süreçlerini tek platformdan yönetin, müşteri iletişimini optimize edin ve verimliliği artırın.', cta_primary: 'Ücretsiz Deneyin', cta_secondary: 'Demo İzleyin' },
@@ -15,64 +14,27 @@ const fallback = {
   cta: { title: 'Mesajlaşma Yönetiminizi Bir Üst Seviyeye Taşıyın', subtitle: '14 gün ücretsiz deneme ile hemen başlayın. Kredi kartı gerektirmez.', cta_primary: 'Ücretsiz Başlayın', cta_secondary: 'Fiyatları İnceleyin' },
 };
 
-const STORAGE_KEY = 'msgloom_content';
-
-function getStoredContent() {
-  if (typeof window === 'undefined') return null;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-    return JSON.parse(stored);
-  } catch { return null; }
-}
-
-export function saveContent(content) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-  // Dispatch event so other tabs/components pick up the change
-  window.dispatchEvent(new Event('content-updated'));
-}
-
 export function useContent() {
   const [content, setContent] = useState(fallback);
   const [loaded, setLoaded] = useState(false);
 
-  const loadContent = useCallback(() => {
-    const stored = getStoredContent();
-    if (stored && Object.keys(stored).length > 0) {
-      const merged = { ...fallback };
-      for (const [section, keys] of Object.entries(stored)) {
-        merged[section] = { ...(fallback[section] || {}), ...keys };
-      }
-      setContent(merged);
-    }
-    setLoaded(true);
+  useEffect(() => {
+    fetch('/content.json?v=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (data && Object.keys(data).length > 0) {
+          const merged = { ...fallback };
+          for (const [section, keys] of Object.entries(data)) {
+            merged[section] = { ...(fallback[section] || {}), ...keys };
+          }
+          setContent(merged);
+        }
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
   }, []);
 
-  useEffect(() => {
-    loadContent();
-    const handler = () => loadContent();
-    window.addEventListener('content-updated', handler);
-    window.addEventListener('storage', handler);
-    return () => {
-      window.removeEventListener('content-updated', handler);
-      window.removeEventListener('storage', handler);
-    };
-  }, [loadContent]);
-
   return { content, loaded };
-}
-
-export function getAllContent() {
-  const stored = getStoredContent();
-  if (stored && Object.keys(stored).length > 0) {
-    const merged = { ...fallback };
-    for (const [section, keys] of Object.entries(stored)) {
-      merged[section] = { ...(fallback[section] || {}), ...keys };
-    }
-    return merged;
-  }
-  return { ...fallback };
 }
 
 export function getDefaults() {

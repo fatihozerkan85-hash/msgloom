@@ -2,8 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquare, LogOut, ExternalLink, FileText, Save, RefreshCw, ChevronDown, ChevronRight, Loader2, Check, RotateCcw, Download, Upload } from 'lucide-react';
-import { getAllContent, getDefaults, saveContent } from '@/lib/useContent';
+import { MessageSquare, LogOut, ExternalLink, Save, ChevronDown, ChevronRight, Check, RotateCcw, Download, Upload, Loader2, Github } from 'lucide-react';
+import { getDefaults } from '@/lib/useContent';
+
+const GITHUB_REPO = 'fatihozerkan85-hash/msgloom';
+const GITHUB_FILE = 'public/content.json';
+const GITHUB_BRANCH = 'main';
 
 const sectionLabels = {
   navbar: 'Navigasyon', hero: 'Ana Sayfa - Hero', features: 'Özellikler',
@@ -50,10 +54,17 @@ export default function AdminContentPage() {
   const [editValues, setEditValues] = useState({});
   const [openSections, setOpenSections] = useState({});
   const [status, setStatus] = useState(null);
+  const [publishing, setPublishing] = useState(false);
+  const [githubToken, setGithubToken] = useState('');
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [fileSha, setFileSha] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (isAdminAuthenticated()) {
       setAuthenticated(true);
+      const savedToken = localStorage.getItem('github_token');
+      if (savedToken) setGithubToken(savedToken);
       loadContent();
     } else {
       router.push('/admin/login');
@@ -61,34 +72,97 @@ export default function AdminContentPage() {
     setLoading(false);
   }, [router]);
 
-  const loadContent = () => {
-    const c = getAllContent();
-    setContent(c);
-    const vals = {};
-    for (const [section, keys] of Object.entries(c)) {
-      for (const [key, value] of Object.entries(keys)) {
-        vals[`${section}.${key}`] = value;
+  const loadContent = async () => {
+    try {
+      const res = await fetch('/content.json?v=' + Date.now());
+      const data = await res.json();
+      setContent(data);
+      const vals = {};
+      for (const [section, keys] of Object.entries(data)) {
+        for (const [key, value] of Object.entries(keys)) {
+          vals[`${section}.${key}`] = value;
+        }
       }
+      setEditValues(vals);
+    } catch {
+      const defaults = getDefaults();
+      setContent(defaults);
+      const vals = {};
+      for (const [section, keys] of Object.entries(defaults)) {
+        for (const [key, value] of Object.entries(keys)) {
+          vals[`${section}.${key}`] = value;
+        }
+      }
+      setEditValues(vals);
     }
-    setEditValues(vals);
   };
 
-  const handleSave = (section, key) => {
+  const handleFieldSave = (section, key) => {
     const id = `${section}.${key}`;
-    const newContent = { ...content };
+    const newContent = JSON.parse(JSON.stringify(content));
     if (!newContent[section]) newContent[section] = {};
     newContent[section][key] = editValues[id];
     setContent(newContent);
-    saveContent(newContent);
-    setStatus({ type: 'success', text: `"${keyLabels[key] || key}" kaydedildi` });
-    setTimeout(() => setStatus(null), 2000);
+    setHasChanges(true);
+    setStatus({ type: 'success', text: `"${keyLabels[key] || key}" güncellendi. Yayınlamak için "Siteye Yayınla" butonuna basın.` });
+    setTimeout(() => setStatus(null), 3000);
+  };
+
+  const handlePublish = async () => {
+    if (!githubToken) {
+      setShowTokenInput(true);
+      return;
+    }
+    setPublishing(true);
+    setStatus(null);
+    try {
+      // Get current file SHA
+      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`, {
+        headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github.v3+json' },
+      });
+      let sha = null;
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        sha = fileData.sha;
+      }
+
+      // Update file
+      const body = {
+        message: 'Update site content from admin panel',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+        branch: GITHUB_BRANCH,
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (putRes.ok) {
+        setHasChanges(false);
+        setStatus({ type: 'success', text: 'İçerikler GitHub\'a yayınlandı. Vercel 1-2 dakika içinde güncelleyecek.' });
+        localStorage.setItem('github_token', githubToken);
+      } else {
+        const err = await putRes.json();
+        setStatus({ type: 'error', text: `GitHub hatası: ${err.message}` });
+      }
+    } catch (err) {
+      setStatus({ type: 'error', text: 'Bağlantı hatası: ' + err.message });
+    }
+    setPublishing(false);
+    setTimeout(() => setStatus(null), 5000);
   };
 
   const handleResetDefaults = () => {
     if (!confirm('Tüm içerikler varsayılana dönecek. Emin misiniz?')) return;
     const defaults = getDefaults();
     setContent(defaults);
-    saveContent(defaults);
     const vals = {};
     for (const [section, keys] of Object.entries(defaults)) {
       for (const [key, value] of Object.entries(keys)) {
@@ -96,49 +170,9 @@ export default function AdminContentPage() {
       }
     }
     setEditValues(vals);
-    setStatus({ type: 'success', text: 'Varsayılan içerikler yüklendi' });
+    setHasChanges(true);
+    setStatus({ type: 'success', text: 'Varsayılanlar yüklendi. "Siteye Yayınla" ile kaydedin.' });
     setTimeout(() => setStatus(null), 3000);
-  };
-
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `msgloom-content-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const imported = JSON.parse(ev.target.result);
-          setContent(imported);
-          saveContent(imported);
-          const vals = {};
-          for (const [section, keys] of Object.entries(imported)) {
-            for (const [key, value] of Object.entries(keys)) {
-              vals[`${section}.${key}`] = value;
-            }
-          }
-          setEditValues(vals);
-          setStatus({ type: 'success', text: 'İçerikler başarıyla içe aktarıldı' });
-        } catch {
-          setStatus({ type: 'error', text: 'Geçersiz JSON dosyası' });
-        }
-        setTimeout(() => setStatus(null), 3000);
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
 
   const handleLogout = () => {
@@ -165,12 +199,12 @@ export default function AdminContentPage() {
           <div className="flex items-center gap-3">
             <MessageSquare className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
             <span className="font-bold text-gray-900">MsgLoom</span>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin Panel</span>
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Admin</span>
           </div>
           <div className="flex items-center gap-3">
             <a href="/" target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition">
-              <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} /> Siteyi Gör
+              <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} /> Site
             </a>
             <button onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition">
@@ -181,30 +215,47 @@ export default function AdminContentPage() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">İçerik Yönetimi</h2>
-            <p className="text-gray-500 text-sm mt-1">Sitedeki tüm metinleri buradan düzenleyin</p>
+            <p className="text-gray-500 text-sm mt-1">Metinleri düzenleyin, sonra "Siteye Yayınla" ile kaydedin</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <button onClick={handleImport}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
-              <Upload className="w-3.5 h-3.5" strokeWidth={1.5} /> İçe Aktar
-            </button>
-            <button onClick={handleExport}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
-              <Download className="w-3.5 h-3.5" strokeWidth={1.5} /> Dışa Aktar
-            </button>
+          <div className="flex gap-2">
             <button onClick={handleResetDefaults}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition">
-              <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.5} /> Varsayılanları Yükle
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">
+              <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.5} /> Varsayılanlar
+            </button>
+            <button onClick={handlePublish} disabled={publishing}
+              className={`flex items-center gap-1.5 px-5 py-2.5 text-sm text-white rounded-xl transition disabled:opacity-50 ${hasChanges ? 'bg-green-600 hover:bg-green-700 animate-pulse' : 'bg-blue-600 hover:bg-blue-700'}`}>
+              {publishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" strokeWidth={1.5} />}
+              {publishing ? 'Yayınlanıyor...' : 'Siteye Yayınla'}
             </button>
           </div>
         </div>
 
+        {showTokenInput && !githubToken && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+            <p className="text-sm text-yellow-800 mb-3">
+              İçerikleri siteye yayınlamak için GitHub Personal Access Token gerekli.
+              <a href="https://github.com/settings/tokens/new?scopes=repo&description=MsgLoom+Admin" target="_blank" rel="noopener noreferrer"
+                className="text-blue-600 underline ml-1">Buradan oluşturun</a> (repo yetkisi seçin).
+            </p>
+            <div className="flex gap-2">
+              <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)}
+                placeholder="ghp_xxxxxxxxxxxx"
+                className="flex-1 border border-yellow-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              <button onClick={() => { localStorage.setItem('github_token', githubToken); setShowTokenInput(false); handlePublish(); }}
+                disabled={!githubToken}
+                className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 disabled:opacity-50 transition">
+                Kaydet & Yayınla
+              </button>
+            </div>
+          </div>
+        )}
+
         {status && (
           <div className={`mb-6 p-4 rounded-xl text-sm flex items-center gap-2 ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
-            {status.type === 'success' && <Check className="w-4 h-4" strokeWidth={2} />}
+            {status.type === 'success' && <Check className="w-4 h-4 shrink-0" strokeWidth={2} />}
             {status.text}
           </div>
         )}
@@ -230,21 +281,16 @@ export default function AdminContentPage() {
                     const isLong = val.length > 80;
                     return (
                       <div key={key} className="pt-4">
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                          {keyLabels[key] || key}
-                        </label>
+                        <label className="block text-xs font-medium text-gray-500 mb-1.5">{keyLabels[key] || key}</label>
                         <div className="flex gap-2">
                           {isLong ? (
-                            <textarea value={val}
-                              onChange={e => setEditValues(p => ({ ...p, [id]: e.target.value }))}
-                              rows={3}
-                              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none resize-none" />
+                            <textarea value={val} onChange={e => setEditValues(p => ({ ...p, [id]: e.target.value }))}
+                              rows={3} className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none resize-none" />
                           ) : (
-                            <input type="text" value={val}
-                              onChange={e => setEditValues(p => ({ ...p, [id]: e.target.value }))}
+                            <input type="text" value={val} onChange={e => setEditValues(p => ({ ...p, [id]: e.target.value }))}
                               className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
                           )}
-                          <button onClick={() => handleSave(section, key)}
+                          <button onClick={() => handleFieldSave(section, key)}
                             className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition flex items-center gap-1.5 shrink-0">
                             <Save className="w-3.5 h-3.5" strokeWidth={1.5} /> Kaydet
                           </button>
