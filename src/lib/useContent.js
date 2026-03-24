@@ -1,17 +1,44 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const fallback = {
-  navbar: { brand: 'MsgLoom', link1: 'Özellikler', link2: 'Avantajlar', link3: 'İletişim', login: 'Giriş Yap', register: 'Başlayın' },
+  navbar: { brand: 'MsgLoom', link1: 'Özellikler', link2: 'Avantajlar', link3: 'İletişim', link4: 'Nasıl Çalışır', login: 'Giriş Yap', register: 'Başlayın' },
   hero: { title: 'WhatsApp & Telegram\nMesajlaşma Yönetimi', subtitle: 'İşletmenizin mesajlaşma süreçlerini tek platformdan yönetin, müşteri iletişimini optimize edin ve verimliliği artırın.', cta_primary: 'Ücretsiz Deneyin', cta_secondary: 'Demo İzleyin' },
-  features: { title: 'Güçlü Özellikler', subtitle: 'İşletmeniz için tasarlanmış kapsamlı mesajlaşma çözümü', card1_title: 'Çoklu Kanal Yönetimi', card1_desc: 'WhatsApp ve Telegram hesaplarınızı tek bir platformdan yönetin.', card2_title: 'Detaylı Analitik', card2_desc: 'Mesajlaşma metriklerinizi görselleştirin.', card3_title: 'Otomasyon', card3_desc: 'Tekrarlayan görevleri otomatikleştirin.' },
+  features: { title: 'Güçlü Özellikler', subtitle: 'İşletmeniz için tasarlanmış kapsamlı mesajlaşma çözümü', card1_title: 'Çoklu Kanal Yönetimi', card1_desc: 'WhatsApp ve Telegram hesaplarınızı tek bir platformdan yönetin. Tüm mesajlarınızı merkezi bir yerden takip edin.', card2_title: 'Detaylı Analitik', card2_desc: 'Mesajlaşma metriklerinizi görselleştirin. Performans raporları ile verimliliği ölçümleyin ve optimize edin.', card3_title: 'Otomasyon', card3_desc: 'Tekrarlayan görevleri otomatikleştirin. Akıllı yanıtlar ve mesaj şablonları ile zamandan tasarruf edin.' },
+  howItWorks: {
+    badge: 'Sadece 4 Adım', title: 'Nasıl Çalışır?', subtitle: 'MsgLoom ile dakikalar içinde botunuzu kurun ve satışa başlayın. Teknik bilgiye gerek yok!',
+    step1_number: '01', step1_title: 'Platformu Bağlayın', step1_desc: 'WhatsApp, Telegram veya Instagram hesabınızı tek tıkla bağlayın. QR kod ile 30 saniyede hazır.',
+    step1_feat1: 'QR kod ile anında bağlantı', step1_feat2: 'Çoklu platform desteği', step1_feat3: 'Güvenli şifreleme',
+    step2_number: '02', step2_title: 'Botunuzu Özelleştirin', step2_desc: 'Ürünlerinizi ekleyin, yanıt şablonlarını oluşturun, kampanyalarınızı tanımlayın.',
+    step2_feat1: 'Sürükle-bırak ürün ekleme', step2_feat2: 'Akıllı yanıt şablonları', step2_feat3: 'Kişiselleştirilebilir mesajlar',
+    step3_number: '03', step3_title: 'Otomatik Satış Yapın', step3_desc: 'Botunuz 7/24 müşterilerinize yanıt versin, ürün önersin ve satış tamamlasın.',
+    step3_feat1: 'Anlık otomatik yanıtlar', step3_feat2: 'Akıllı ürün önerileri', step3_feat3: 'Otomatik sipariş alma',
+    step4_number: '04', step4_title: 'Analitiği İzleyin', step4_desc: 'Dashboard üzerinden satışlarınızı, müşteri memnuniyetini ve performansı takip edin.',
+    step4_feat1: 'Gerçek zamanlı raporlar', step4_feat2: 'Detaylı satış analitiği', step4_feat3: 'Müşteri davranış takibi',
+    cta_title: 'Hazır mısınız?', cta_desc: 'Hemen şimdi ücretsiz deneyin. Kredi kartı gerekmez, 14 gün boyunca tüm özellikleri kullanın.',
+    cta_button: 'Ücretsiz Başlayın', cta_sub: '5 dakikada kurulum • Anında aktifleşme • İstediğiniz zaman iptal edin'
+  },
+  demo: {
+    badge: 'Canlı Bot Demo', title: 'Botun Nasıl Çalıştığını', title_highlight: 'Canlı İzleyin',
+    subtitle: "MsgLoom botunuz, WhatsApp, Telegram ve Instagram'da müşterilerinize anında yanıt veriyor. Her mesajı satış fırsatına dönüştürün.",
+    wa_badge: 'WhatsApp Canlı', wa_title: 'WhatsApp Otomasyonu', wa_desc: 'Müşterileriniz mesaj attığı anda bot devreye giriyor',
+    wa_feat_title: 'WhatsApp Özellikleri', wa_feat1: 'Anında otomatik yanıt', wa_feat2: 'Ürün stok sorgulama', wa_feat3: 'Sipariş oluşturma', wa_feat4: 'Ödeme linki gönderme',
+    tg_badge: 'Telegram Canlı', tg_title: 'Telegram Otomasyonu', tg_desc: 'Kampanyalarınızı ve ürünlerinizi otomatik tanıtın',
+    tg_feat_title: 'Telegram Özellikleri', tg_feat1: 'Kampanya duyuruları', tg_feat2: 'Ürün kataloğu gösterimi', tg_feat3: 'Fiyat bilgilendirme', tg_feat4: 'Otomatik öneri sistemi',
+    ig_badge: 'Instagram Canlı', ig_title: 'Instagram DM Otomasyonu', ig_desc: "DM'lerden gelen sorulara anında yanıt, satış tamamlama",
+    ig_feat_title: 'Instagram Özellikleri', ig_feat1: "DM'den ürün satışı", ig_feat2: 'Story yanıtlarını yönetme', ig_feat3: 'İndirim kodu gönderme', ig_feat4: 'Otomatik ürün önerisi',
+    stat1_value: '<2sn', stat1_label: 'Ortalama Yanıt Süresi', stat2_value: '%95', stat2_label: 'Müşteri Memnuniyeti',
+    stat3_value: '7/24', stat3_label: 'Kesintisiz Hizmet', stat4_value: '%60', stat4_label: 'Dönüşüm Artışı',
+    cta_button: 'Hemen Botunuzu Kurun - Ücretsiz Deneyin', cta_sub: 'Kredi kartı gerektirmez • 14 gün ücretsiz'
+  },
   sales: { badge: 'Satış Dönüşümü', title: "DM'den Gelen Her Mesajı", title_highlight: 'Satışa Çevirin', description: 'Otomatik yanıtlar, akıllı yönlendirme ve detaylı analitik ile müşteri mesajlarınızı kaçırmayın.', stat1_value: '%85', stat1_label: 'Anında Yanıt', stat1_sub: 'daha hızlı cevap', stat2_value: '%60', stat2_label: 'Dönüşüm Oranı', stat2_sub: 'artış sağlar', stat3_value: '%95', stat3_label: 'Müşteri Memnuniyeti', stat3_sub: 'memnuniyet oranı', cta: 'Hemen Başlayın' },
-  why: { title: 'Neden MsgLoom?', card1_title: 'Güvenli İletişim', card1_desc: 'End-to-end şifreleme ile müşteri verileriniz güvende.', card2_title: 'Ekip Yönetimi', card2_desc: 'Çoklu kullanıcı desteği ile ekibinizi organize edin.', card3_title: '7/24 Destek', card3_desc: 'Türkçe teknik destek ekibimiz her zaman yanınızda.' },
+  why: { title: 'Neden MsgLoom?', card1_title: 'Güvenli İletişim', card1_desc: 'End-to-end şifreleme ile müşteri verileriniz güvende. KVKK ve GDPR uyumlu altyapı.', card2_title: 'Ekip Yönetimi', card2_desc: 'Çoklu kullanıcı desteği ile ekibinizi organize edin. Rol tabanlı erişim kontrolü.', card3_title: '7/24 Destek', card3_desc: 'Türkçe teknik destek ekibimiz her zaman yanınızda. Hızlı çözüm, kesintisiz hizmet.' },
   stats: { stat1_value: '5000+', stat1_label: 'Aktif Kullanıcı', stat2_value: '1M+', stat2_label: 'Günlük Mesaj', stat3_value: '99.9%', stat3_label: 'Uptime', stat4_value: '24/7', stat4_label: 'Destek' },
   setup: { badge: 'Hızlı Başlangıç', title: 'Botu Kur ve', title_highlight: 'Satışa Başla', subtitle: '3 adımda kurulum tamamla, dakikalar içinde ilk müşterilerinle konuşmaya başla.', step1_title: 'Hesabını Oluştur', step1_desc: '2 dakikada kayıt ol, onay beklemeden başla', step2_title: 'WhatsApp/Telegram Bağla', step2_desc: 'QR kod ile anında bağlan, tek tık yeterli', step3_title: 'Satışları İzle', step3_desc: "Dashboard'tan tüm mesajları yönet, satış yap", timer: 'Ortalama kurulum süresi sadece', timer_bold: '5 dakika' },
-  guarantee: { badge: '%100 Garanti', title: '5 Gün Kullanın,', title_highlight: 'Beğenmezseniz Paranızı İade Edelim', description: 'Ürünümüze güveniyoruz. Eğer 5 gün içinde memnun kalmazsanız, hiçbir soru sormadan paranızı iade ediyoruz.', item1: 'Soru sormadan tam iade', item2: 'Otomatik iade işlemi', item3: 'Kredi kartına 24 saat içinde iade', item4: 'Taahhüt yok, ceza yok', trust_title: '%100 Güvenli', trust_sub: 'Risksiz deneme garantisi', trust_desc: "5,000+ mutlu müşterimiz var ve %98'i ürünü kullanmaya devam ediyor." },
+  guarantee: { badge: '%100 Garanti', title: '5 Gün Kullanın,', title_highlight: 'Beğenmezseniz Paranızı İade Edelim', description: 'Ürünümüze güveniyoruz. Eğer 5 gün içinde memnun kalmazsanız, hiçbir soru sormadan paranızı iade ediyoruz.', item1: 'Soru sormadan tam iade', item2: 'Otomatik iade işlemi', item3: 'Kredi kartına 24 saat içinde iade', item4: 'Taahhüt yok, ceza yok', trust_title: '%100 Güvenli', trust_sub: 'Risksiz deneme garantisi', trust_desc: "5,000+ mutlu müşterimiz var ve %98'i ürünü kullanmaya devam ediyor.", review_text: 'İlk günden satışlarım arttı. Kesinlikle denemeye değer!', review_author: '- Ahmet K., E-ticaret' },
   cta: { title: 'Mesajlaşma Yönetiminizi Bir Üst Seviyeye Taşıyın', subtitle: '14 gün ücretsiz deneme ile hemen başlayın. Kredi kartı gerektirmez.', cta_primary: 'Ücretsiz Başlayın', cta_secondary: 'Fiyatları İnceleyin' },
+  footer: { desc: 'WhatsApp & Telegram mesajlaşma yönetiminde güvenilir çözüm ortağınız.', col1_title: 'Ürün', col1_link1: 'Özellikler', col1_link2: 'Fiyatlandırma', col1_link3: 'Demo', col2_title: 'Şirket', col2_link1: 'Hakkımızda', col2_link2: 'Blog', col2_link3: 'Kariyer', col3_title: 'Destek', col3_link1: 'Yardım Merkezi', col3_link2: 'İletişim', col3_link3: 'Gizlilik', copyright: '© 2026 MsgLoom. Tüm hakları saklıdır.' },
 };
 
 export function useContent() {

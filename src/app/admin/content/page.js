@@ -11,14 +11,16 @@ const GITHUB_BRANCH = 'main';
 
 const sectionLabels = {
   navbar: 'Navigasyon', hero: 'Ana Sayfa - Hero', features: 'Özellikler',
+  howItWorks: 'Nasıl Çalışır (4 Adım)', demo: 'Canlı Bot Demo',
   sales: 'Satış Dönüşümü', why: 'Neden MsgLoom', stats: 'İstatistikler',
   setup: 'Kurulum Adımları', guarantee: 'Garanti', cta: 'CTA (Aksiyon Çağrısı)',
+  footer: 'Footer (Alt Bilgi)',
 };
 
 const keyLabels = {
   title: 'Başlık', subtitle: 'Alt Başlık', description: 'Açıklama', brand: 'Marka Adı',
   cta_primary: 'Ana Buton', cta_secondary: 'İkinci Buton', badge: 'Rozet',
-  title_highlight: 'Vurgulu Başlık', link1: 'Link 1', link2: 'Link 2', link3: 'Link 3',
+  title_highlight: 'Vurgulu Başlık', link1: 'Link 1', link2: 'Link 2', link3: 'Link 3', link4: 'Link 4 (Nasıl Çalışır)',
   login: 'Giriş Butonu', register: 'Kayıt Butonu', cta: 'CTA Butonu',
   card1_title: 'Kart 1 Başlık', card1_desc: 'Kart 1 Açıklama',
   card2_title: 'Kart 2 Başlık', card2_desc: 'Kart 2 Açıklama',
@@ -30,9 +32,29 @@ const keyLabels = {
   step1_title: 'Adım 1 Başlık', step1_desc: 'Adım 1 Açıklama',
   step2_title: 'Adım 2 Başlık', step2_desc: 'Adım 2 Açıklama',
   step3_title: 'Adım 3 Başlık', step3_desc: 'Adım 3 Açıklama',
+  step1_number: 'Adım 1 Numara', step2_number: 'Adım 2 Numara', step3_number: 'Adım 3 Numara', step4_number: 'Adım 4 Numara',
+  step4_title: 'Adım 4 Başlık', step4_desc: 'Adım 4 Açıklama',
+  step1_feat1: 'Adım 1 Özellik 1', step1_feat2: 'Adım 1 Özellik 2', step1_feat3: 'Adım 1 Özellik 3',
+  step2_feat1: 'Adım 2 Özellik 1', step2_feat2: 'Adım 2 Özellik 2', step2_feat3: 'Adım 2 Özellik 3',
+  step3_feat1: 'Adım 3 Özellik 1', step3_feat2: 'Adım 3 Özellik 2', step3_feat3: 'Adım 3 Özellik 3',
+  step4_feat1: 'Adım 4 Özellik 1', step4_feat2: 'Adım 4 Özellik 2', step4_feat3: 'Adım 4 Özellik 3',
+  cta_title: 'CTA Başlık', cta_desc: 'CTA Açıklama', cta_button: 'CTA Buton', cta_sub: 'CTA Alt Metin',
   timer: 'Zamanlayıcı', timer_bold: 'Zamanlayıcı Kalın',
   item1: 'Madde 1', item2: 'Madde 2', item3: 'Madde 3', item4: 'Madde 4',
   trust_title: 'Güven Başlık', trust_sub: 'Güven Alt', trust_desc: 'Güven Açıklama',
+  review_text: 'Yorum Metni', review_author: 'Yorum Yazarı',
+  // Demo bölümü
+  wa_badge: 'WhatsApp Rozet', wa_title: 'WhatsApp Başlık', wa_desc: 'WhatsApp Açıklama',
+  wa_feat_title: 'WhatsApp Özellik Başlık', wa_feat1: 'WA Özellik 1', wa_feat2: 'WA Özellik 2', wa_feat3: 'WA Özellik 3', wa_feat4: 'WA Özellik 4',
+  tg_badge: 'Telegram Rozet', tg_title: 'Telegram Başlık', tg_desc: 'Telegram Açıklama',
+  tg_feat_title: 'Telegram Özellik Başlık', tg_feat1: 'TG Özellik 1', tg_feat2: 'TG Özellik 2', tg_feat3: 'TG Özellik 3', tg_feat4: 'TG Özellik 4',
+  ig_badge: 'Instagram Rozet', ig_title: 'Instagram Başlık', ig_desc: 'Instagram Açıklama',
+  ig_feat_title: 'Instagram Özellik Başlık', ig_feat1: 'IG Özellik 1', ig_feat2: 'IG Özellik 2', ig_feat3: 'IG Özellik 3', ig_feat4: 'IG Özellik 4',
+  // Footer
+  desc: 'Açıklama', col1_title: 'Kolon 1 Başlık', col1_link1: 'Kolon 1 Link 1', col1_link2: 'Kolon 1 Link 2', col1_link3: 'Kolon 1 Link 3',
+  col2_title: 'Kolon 2 Başlık', col2_link1: 'Kolon 2 Link 1', col2_link2: 'Kolon 2 Link 2', col2_link3: 'Kolon 2 Link 3',
+  col3_title: 'Kolon 3 Başlık', col3_link1: 'Kolon 3 Link 1', col3_link2: 'Kolon 3 Link 2', col3_link3: 'Kolon 3 Link 3',
+  copyright: 'Telif Hakkı',
 };
 
 function isAdminAuthenticated() {

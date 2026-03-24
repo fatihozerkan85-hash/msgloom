@@ -37,7 +37,7 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link1')}</a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600">Nasıl Çalışır</a>
+              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link4')}</a>
               <a href="#benefits" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link2')}</a>
               <a href="#contact" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link3')}</a>
               <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium">{t(c,'navbar','login')}</Link>
@@ -114,14 +114,14 @@ export default function Home() {
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: -30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
             <motion.div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6" animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
               <MessageSquare className="w-5 h-5 text-green-400" />
-              <span className="text-white font-semibold">Canlı Bot Demo</span>
+              <span className="text-white font-semibold">{t(c,'demo','badge')}</span>
             </motion.div>
             <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
-              Botun Nasıl Çalıştığını
-              <span className="block bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Canlı İzleyin</span>
+              {t(c,'demo','title')}
+              <span className="block bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">{t(c,'demo','title_highlight')}</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              MsgLoom botunuz, WhatsApp, Telegram ve Instagram&apos;da müşterilerinize anında yanıt veriyor. Her mesajı satış fırsatına dönüştürün.
+              {t(c,'demo','subtitle')}
             </p>
           </motion.div>
 
@@ -131,18 +131,18 @@ export default function Home() {
               <div className="text-center">
                 <div className="inline-flex items-center gap-2 bg-green-500/20 backdrop-blur-sm border border-green-500/30 px-4 py-2 rounded-full mb-4">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-300 font-semibold">WhatsApp Canlı</span>
+                  <span className="text-green-300 font-semibold">{t(c,'demo','wa_badge')}</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">WhatsApp Otomasyonu</h3>
-                <p className="text-gray-400">Müşterileriniz mesaj attığı anda bot devreye giriyor</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t(c,'demo','wa_title')}</h3>
+                <p className="text-gray-400">{t(c,'demo','wa_desc')}</p>
               </div>
               <WhatsAppMockup />
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
                 <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-400" /> WhatsApp Özellikleri
+                  <CheckCircle2 className="w-5 h-5 text-green-400" /> {t(c,'demo','wa_feat_title')}
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  {['Anında otomatik yanıt', 'Ürün stok sorgulama', 'Sipariş oluşturma', 'Ödeme linki gönderme'].map((item, j) => (
+                  {[t(c,'demo','wa_feat1'), t(c,'demo','wa_feat2'), t(c,'demo','wa_feat3'), t(c,'demo','wa_feat4')].map((item, j) => (
                     <li key={j} className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>{item}</li>
                   ))}
                 </ul>
@@ -154,18 +154,18 @@ export default function Home() {
               <div className="text-center">
                 <div className="inline-flex items-center gap-2 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 px-4 py-2 rounded-full mb-4">
                   <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span className="text-blue-300 font-semibold">Telegram Canlı</span>
+                  <span className="text-blue-300 font-semibold">{t(c,'demo','tg_badge')}</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Telegram Otomasyonu</h3>
-                <p className="text-gray-400">Kampanyalarınızı ve ürünlerinizi otomatik tanıtın</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t(c,'demo','tg_title')}</h3>
+                <p className="text-gray-400">{t(c,'demo','tg_desc')}</p>
               </div>
               <TelegramMockup />
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
                 <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-blue-400" /> Telegram Özellikleri
+                  <CheckCircle2 className="w-5 h-5 text-blue-400" /> {t(c,'demo','tg_feat_title')}
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  {['Kampanya duyuruları', 'Ürün kataloğu gösterimi', 'Fiyat bilgilendirme', 'Otomatik öneri sistemi'].map((item, j) => (
+                  {[t(c,'demo','tg_feat1'), t(c,'demo','tg_feat2'), t(c,'demo','tg_feat3'), t(c,'demo','tg_feat4')].map((item, j) => (
                     <li key={j} className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>{item}</li>
                   ))}
                 </ul>
@@ -177,18 +177,18 @@ export default function Home() {
               <div className="text-center">
                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-orange-500/20 backdrop-blur-sm border border-pink-500/30 px-4 py-2 rounded-full mb-4">
                   <div className="w-3 h-3 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-pulse"></div>
-                  <span className="text-pink-300 font-semibold">Instagram Canlı</span>
+                  <span className="text-pink-300 font-semibold">{t(c,'demo','ig_badge')}</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Instagram DM Otomasyonu</h3>
-                <p className="text-gray-400">DM&apos;lerden gelen sorulara anında yanıt, satış tamamlama</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t(c,'demo','ig_title')}</h3>
+                <p className="text-gray-400">{t(c,'demo','ig_desc')}</p>
               </div>
               <InstagramMockup />
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
                 <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-pink-400" /> Instagram Özellikleri
+                  <CheckCircle2 className="w-5 h-5 text-pink-400" /> {t(c,'demo','ig_feat_title')}
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  {["DM'den ürün satışı", 'Story yanıtlarını yönetme', 'İndirim kodu gönderme', 'Otomatik ürün önerisi'].map((item, j) => (
+                  {[t(c,'demo','ig_feat1'), t(c,'demo','ig_feat2'), t(c,'demo','ig_feat3'), t(c,'demo','ig_feat4')].map((item, j) => (
                     <li key={j} className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div>{item}</li>
                   ))}
                 </ul>
@@ -199,10 +199,10 @@ export default function Home() {
           {/* Stats below demos */}
           <motion.div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }}>
             {[
-              { value: '<2sn', label: 'Ortalama Yanıt Süresi' },
-              { value: '%95', label: 'Müşteri Memnuniyeti' },
-              { value: '7/24', label: 'Kesintisiz Hizmet' },
-              { value: '%60', label: 'Dönüşüm Artışı' },
+              { value: t(c,'demo','stat1_value'), label: t(c,'demo','stat1_label') },
+              { value: t(c,'demo','stat2_value'), label: t(c,'demo','stat2_label') },
+              { value: t(c,'demo','stat3_value'), label: t(c,'demo','stat3_label') },
+              { value: t(c,'demo','stat4_value'), label: t(c,'demo','stat4_label') },
             ].map((stat, index) => (
               <motion.div key={stat.label} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-center" whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }} transition={{ type: 'spring', stiffness: 300 }}>
                 <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
@@ -214,10 +214,10 @@ export default function Home() {
           <motion.div className="mt-12 text-center" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} viewport={{ once: true }}>
             <motion.div whileHover={{ scale: 1.05, boxShadow: '0 20px 50px rgba(34, 197, 94, 0.4)' }} whileTap={{ scale: 0.95 }}>
               <Link href="/register" className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-2xl inline-block">
-                Hemen Botunuzu Kurun - Ücretsiz Deneyin
+                {t(c,'demo','cta_button')}
               </Link>
             </motion.div>
-            <p className="text-gray-400 text-sm mt-4">Kredi kartı gerektirmez • 14 gün ücretsiz</p>
+            <p className="text-gray-400 text-sm mt-4">{t(c,'demo','cta_sub')}</p>
           </motion.div>
         </div>
       </section>
@@ -372,8 +372,8 @@ export default function Home() {
               </motion.div>
               <motion.div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-2xl p-4 max-w-xs" animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}>
                 <div className="flex gap-0.5 text-yellow-500 mb-2">★ ★ ★ ★ ★</div>
-                <p className="text-sm text-gray-700 italic">&quot;İlk günden satışlarım arttı. Kesinlikle denemeye değer!&quot;</p>
-                <p className="text-xs text-gray-500 mt-2">- Ahmet K., E-ticaret</p>
+                <p className="text-sm text-gray-700 italic">&quot;{t(c,'guarantee','review_text')}&quot;</p>
+                <p className="text-xs text-gray-500 mt-2">{t(c,'guarantee','review_author')}</p>
               </motion.div>
             </motion.div>
           </div>
@@ -405,35 +405,35 @@ export default function Home() {
                 <MessageSquare className="w-6 h-6 text-blue-400" />
                 <span className="ml-2 text-lg font-semibold">MsgLoom</span>
               </div>
-              <p className="text-gray-400">WhatsApp & Telegram mesajlaşma yönetiminde güvenilir çözüm ortağınız.</p>
+              <p className="text-gray-400">{t(c,'footer','desc')}</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Ürün</h4>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col1_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white">Özellikler</a></li>
-                <li><a href="#" className="hover:text-white">Fiyatlandırma</a></li>
-                <li><a href="#" className="hover:text-white">Demo</a></li>
+                <li><a href="#features" className="hover:text-white">{t(c,'footer','col1_link1')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link2')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link3')}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Şirket</h4>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col2_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Hakkımızda</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Kariyer</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link1')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link2')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link3')}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Destek</h4>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col3_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Yardım Merkezi</a></li>
-                <li><a href="#" className="hover:text-white">İletişim</a></li>
-                <li><a href="#" className="hover:text-white">Gizlilik</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link1')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link2')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link3')}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2026 MsgLoom. Tüm hakları saklıdır.</p>
+            <p>{t(c,'footer','copyright')}</p>
           </div>
         </div>
       </footer>
