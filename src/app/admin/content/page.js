@@ -11,7 +11,7 @@ export default function AdminContentPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/admin/auth')
+    fetch('/api/panel-auth')
       .then(res => res.json())
       .then(data => {
         if (data.authenticated) {
