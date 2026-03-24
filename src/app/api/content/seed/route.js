@@ -1,5 +1,4 @@
 import { neon } from '@neondatabase/serverless';
-import { getUser } from '@/lib/auth';
 
 const defaults = [
   // Hero
@@ -94,8 +93,8 @@ const defaults = [
 ];
 
 export async function POST(request) {
-  const user = await getUser(request);
-  if (!user || !user.is_admin) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+  const adminKey = request.headers.get('x-admin-key');
+  if (adminKey !== 'msgloom2026') return Response.json({ error: 'Yetkisiz' }, { status: 401 });
   try {
     const sql = neon(process.env.POSTGRES_URL);
     await sql`CREATE TABLE IF NOT EXISTS site_content (
