@@ -10,25 +10,19 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    try {
-      const res = await fetch('/api/panel-auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        router.push('/admin/content');
-      } else {
-        setError(data.error || 'Hatalı şifre');
-      }
-    } catch {
-      setError('Bağlantı hatası');
+    // Client-side auth - şifre kontrolü
+    if (password === 'msgloom2026') {
+      // localStorage'a token kaydet
+      const token = btoa(JSON.stringify({ role: 'admin', exp: Date.now() + 24 * 60 * 60 * 1000 }));
+      localStorage.setItem('admin_token', token);
+      router.push('/admin/content');
+    } else {
+      setError('Hatalı şifre');
     }
     setLoading(false);
   };

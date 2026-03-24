@@ -1,15 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 import { getUser } from '@/lib/auth';
-import jwt from 'jsonwebtoken';
 
-function isAdmin(request) {
-  try {
-    const cookie = request.cookies.get('admin_token')?.value;
-    if (!cookie) return false;
-    const secret = process.env.JWT_SECRET || 'msgloom-secret-key-change-this';
-    const decoded = jwt.verify(cookie, secret);
-    return decoded.role === 'admin';
-  } catch { return false; }
+function isAdminHeader(request) {
+  const authHeader = request.headers.get('x-admin-key');
+  return authHeader === 'msgloom2026';
 }
 
 export async function GET() {
@@ -43,7 +37,7 @@ export async function GET() {
 }
 
 export async function PUT(request) {
-  const adminOk = isAdmin(request);
+  const adminOk = isAdminHeader(request);
   const user = await getUser(request);
   if (!adminOk && (!user || !user.is_admin)) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
 
