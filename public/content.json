@@ -173,14 +173,14 @@
     "col1_link1": "Özellikler",
     "col1_link2": "Fiyatlandırma",
     "col1_link3": "Demo",
-    "col2_title": "Şirket",
-    "col2_link1": "Hakkımızda",
-    "col2_link2": "Blog",
-    "col2_link3": "Kariyer",
+    "col2_title": "Yasal",
+    "col2_link1": "Kullanım Koşulları",
+    "col2_link2": "Gizlilik Politikası",
+    "col2_link3": "Ödeme ve İade",
     "col3_title": "Destek",
-    "col3_link1": "Yardım Merkezi",
+    "col3_link1": "SLA",
     "col3_link2": "İletişim",
-    "col3_link3": "Gizlilik",
+    "col3_link3": "KVKK",
     "copyright": "© 2026 MsgLoom. Tüm hakları saklıdır."
   }
 }

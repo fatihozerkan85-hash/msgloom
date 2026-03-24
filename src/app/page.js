@@ -418,17 +418,17 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">{t(c,'footer','col2_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link1')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link2')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col2_link3')}</a></li>
+                <li><Link href="/terms" className="hover:text-white">{t(c,'footer','col2_link1')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link2')}</Link></li>
+                <li><Link href="/payment" className="hover:text-white">{t(c,'footer','col2_link3')}</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t(c,'footer','col3_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link1')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link2')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col3_link3')}</a></li>
+                <li><Link href="/sla" className="hover:text-white">{t(c,'footer','col3_link1')}</Link></li>
+                <li><a href="#contact" className="hover:text-white">{t(c,'footer','col3_link2')}</a></li>
+                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col3_link3')}</Link></li>
               </ul>
             </div>
           </div>
