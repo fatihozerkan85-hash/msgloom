@@ -96,6 +96,30 @@ export default function AdminContentPage() {
 
   const loadContent = async () => {
     try {
+      // Önce GitHub'dan güncel veriyi çek (cache sorunu olmaz)
+      const savedToken = localStorage.getItem('github_token');
+      if (savedToken) {
+        try {
+          const ghRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`, {
+            headers: { Authorization: `Bearer ${savedToken}`, Accept: 'application/vnd.github.v3+json' },
+          });
+          if (ghRes.ok) {
+            const ghData = await ghRes.json();
+            const decoded = JSON.parse(decodeURIComponent(escape(atob(ghData.content))));
+            setFileSha(ghData.sha);
+            setContent(decoded);
+            const vals = {};
+            for (const [section, keys] of Object.entries(decoded)) {
+              for (const [key, value] of Object.entries(keys)) {
+                vals[`${section}.${key}`] = value;
+              }
+            }
+            setEditValues(vals);
+            return;
+          }
+        } catch {}
+      }
+      // Fallback: local content.json
       const res = await fetch('/content.json?v=' + Date.now());
       const data = await res.json();
       setContent(data);
@@ -168,11 +192,21 @@ export default function AdminContentPage() {
 
       if (putRes.ok) {
         setHasChanges(false);
-        setStatus({ type: 'success', text: 'İçerikler GitHub\'a yayınlandı. Vercel 1-2 dakika içinde güncelleyecek.' });
+        setStatus({ type: 'success', text: 'İçerikler GitHub\'a yayınlandı! Site 1-2 dakika içinde güncellenecek. Sayfayı yenileyerek kontrol edebilirsiniz.' });
         localStorage.setItem('github_token', githubToken);
+        // SHA'yı güncelle
+        const putData = await putRes.json();
+        if (putData.content?.sha) setFileSha(putData.content.sha);
       } else {
         const err = await putRes.json();
-        setStatus({ type: 'error', text: `GitHub hatası: ${err.message}` });
+        if (err.message?.includes('Bad credentials')) {
+          setStatus({ type: 'error', text: 'GitHub token geçersiz veya süresi dolmuş. Lütfen yeni token oluşturun.' });
+          localStorage.removeItem('github_token');
+          setGithubToken('');
+          setShowTokenInput(true);
+        } else {
+          setStatus({ type: 'error', text: `GitHub hatası: ${err.message}` });
+        }
       }
     } catch (err) {
       setStatus({ type: 'error', text: 'Bağlantı hatası: ' + err.message });
@@ -241,6 +275,15 @@ export default function AdminContentPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">İçerik Yönetimi</h2>
             <p className="text-gray-500 text-sm mt-1">Metinleri düzenleyin, sonra "Siteye Yayınla" ile kaydedin</p>
+            {githubToken ? (
+              <p className="text-green-600 text-xs mt-1 flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span> GitHub bağlı — yayınlamaya hazır
+              </p>
+            ) : (
+              <p className="text-orange-600 text-xs mt-1 flex items-center gap-1">
+                <span className="w-2 h-2 bg-orange-500 rounded-full inline-block"></span> GitHub token gerekli — yayınlamak için token girin
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             <button onClick={handleResetDefaults}

@@ -46,8 +46,12 @@ export function useContent() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    fetch('/content.json?v=' + Date.now())
-      .then(res => res.json())
+    // GitHub raw URL ile cache bypass (Vercel statik cache sorununu çözer)
+    fetch('https://raw.githubusercontent.com/fatihozerkan85-hash/msgloom/main/public/content.json?v=' + Date.now())
+      .then(res => {
+        if (!res.ok) throw new Error('GitHub fetch failed');
+        return res.json();
+      })
       .then(data => {
         if (data && Object.keys(data).length > 0) {
           const merged = { ...fallback };
@@ -58,7 +62,22 @@ export function useContent() {
         }
         setLoaded(true);
       })
-      .catch(() => setLoaded(true));
+      .catch(() => {
+        // Fallback: local content.json
+        fetch('/content.json?v=' + Date.now())
+          .then(res => res.json())
+          .then(data => {
+            if (data && Object.keys(data).length > 0) {
+              const merged = { ...fallback };
+              for (const [section, keys] of Object.entries(data)) {
+                merged[section] = { ...(fallback[section] || {}), ...keys };
+              }
+              setContent(merged);
+            }
+            setLoaded(true);
+          })
+          .catch(() => setLoaded(true));
+      });
   }, []);
 
   return { content, loaded };
