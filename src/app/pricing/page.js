@@ -1,31 +1,33 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Check, Zap, Rocket, Building2, MessageSquare, Users, BarChart3, Headphones, Shield, Crown } from 'lucide-react';
+import { Check, Zap, Rocket, Building2, MessageSquare, Users, BarChart3, Headphones, Shield, Crown, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const plans = [
   {
-    name: 'Başlangıç', icon: Zap, price: '₺999', period: '/ay',
+    id: 'starter', name: 'Başlangıç', icon: Zap, price: '₺999', period: '/ay',
     description: 'Küçük işletmeler ve yeni başlayanlar için',
     features: ['1 WhatsApp hesabı','1 Telegram hesabı','500 aktif müşteri','Temel CRM özellikleri','Otomatik yanıtlar','1 kullanıcı','Email destek','Temel analitik'],
-    highlight: false, color: 'blue'
+    highlight: false, color: 'blue', borderColor: 'border-blue-500', bgHover: 'hover:border-blue-400', glowColor: 'shadow-blue-200'
   },
   {
-    name: 'Profesyonel', icon: Rocket, price: '₺2.499', period: '/ay',
+    id: 'pro', name: 'Profesyonel', icon: Rocket, price: '₺2.499', period: '/ay',
     description: 'Büyüyen işletmeler için en popüler plan',
     features: ['3 WhatsApp hesabı','3 Telegram hesabı','2.000 aktif müşteri','Tam CRM özellikleri','Gelişmiş otomasyon','5 kullanıcı','Öncelikli destek','Detaylı analitik','API entegrasyonu','Özel raporlar','Takım yönetimi'],
-    highlight: true, color: 'purple', badge: 'En Popüler'
+    highlight: true, color: 'purple', badge: 'En Popüler', borderColor: 'border-purple-500', bgHover: 'hover:border-purple-400', glowColor: 'shadow-purple-200'
   },
   {
-    name: 'Kurumsal', icon: Building2, price: 'Özel', period: '',
+    id: 'enterprise', name: 'Kurumsal', icon: Building2, price: 'Özel', period: '',
     description: 'Büyük ölçekli işletmeler için',
-    features: ['Sınırsız WhatsApp hesabı','Sınırsız Telegram hesabı','Sınırsız aktif müşteri','Kurumsal CRM özellikleri','Özel otomasyon','Sınırsız kullanıcı','7/24 premium destek','Kurumsal analitik','Özel API geliştirme','Dedicated hesap yöneticisi','Özel eğitim','SLA garantisi','White-label çözüm'],
-    highlight: false, color: 'indigo'
+    features: ['Sınırsız WhatsApp hesabı','Sınırsız Telegram hesabı','Sınırsız aktif müşteri','Kurumsal CRM','Özel otomasyon','Sınırsız kullanıcı','7/24 premium destek','Kurumsal analitik','Özel API','Dedicated hesap yöneticisi','SLA garantisi','White-label'],
+    highlight: false, color: 'indigo', borderColor: 'border-indigo-500', bgHover: 'hover:border-indigo-400', glowColor: 'shadow-indigo-200'
   }
 ];
 
-const features = [
+const allFeatures = [
   { icon: MessageSquare, title: 'Çoklu Platform', description: 'WhatsApp, Telegram ve Instagram DM desteği' },
   { icon: Users, title: 'Takım İşbirliği', description: 'Ekibinizle birlikte çalışın' },
   { icon: BarChart3, title: 'Detaylı Analitik', description: 'Performansınızı anlık takip edin' },
@@ -35,6 +37,55 @@ const features = [
 ];
 
 export default function PricingPage() {
+  const [user, setUser] = useState(null);
+  const [checking, setChecking] = useState(true);
+  const [loading, setLoading] = useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutHtml, setCheckoutHtml] = useState('');
+  const checkoutRef = useRef(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setUser(d.user); setChecking(false); }).catch(() => setChecking(false));
+  }, []);
+
+  useEffect(() => {
+    if (showCheckout && checkoutHtml && checkoutRef.current) {
+      checkoutRef.current.innerHTML = checkoutHtml;
+      const scripts = checkoutRef.current.querySelectorAll('script');
+      scripts.forEach(s => {
+        const ns = document.createElement('script');
+        if (s.src) ns.src = s.src; else ns.textContent = s.textContent;
+        document.body.appendChild(ns);
+      });
+    }
+  }, [showCheckout, checkoutHtml]);
+
+  const handleBuy = async (planId) => {
+    if (!user) {
+      router.push(`/login?redirect=/pricing&plan=${planId}`);
+      return;
+    }
+    if (planId === 'enterprise') {
+      window.location.href = 'mailto:info@msgloom.com.tr?subject=Kurumsal Plan Talebi';
+      return;
+    }
+
+    setLoading(planId);
+    try {
+      const res = await fetch('/api/payment/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planId }),
+      });
+      const data = await res.json();
+      if (data.requireLogin) { router.push(`/login?redirect=/pricing&plan=${planId}`); return; }
+      if (data.success) { setCheckoutHtml(data.checkoutFormContent); setShowCheckout(true); }
+      else alert(data.error || 'Ödeme başlatılamadı');
+    } catch { alert('Bağlantı hatası'); }
+    setLoading(null);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <nav className="border-b border-gray-200">
@@ -45,8 +96,14 @@ export default function PricingPage() {
               <Link href="/#features" className="text-gray-700 hover:text-blue-600">Özellikler</Link>
               <Link href="/crm-features" className="text-gray-700 hover:text-blue-600">CRM</Link>
               <Link href="/pricing" className="text-blue-600 font-semibold">Fiyatlandırma</Link>
-              <Link href="/login" className="text-gray-700 hover:text-blue-600">Giriş</Link>
-              <Link href="/register" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Başlayın</Link>
+              {user ? (
+                <Link href="/dashboard" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Dashboard</Link>
+              ) : (
+                <>
+                  <Link href="/login" className="text-gray-700 hover:text-blue-600">Giriş</Link>
+                  <Link href="/register" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Başlayın</Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -68,30 +125,83 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 items-start">
             {plans.map((plan, index) => (
-              <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative bg-white rounded-2xl shadow-xl overflow-hidden ${plan.highlight ? 'border-4 border-purple-500 transform scale-105' : 'border border-gray-200'}`}>
-                {plan.badge && <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-bl-lg text-sm font-semibold">{plan.badge}</div>}
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+                whileHover={{ y: -12, scale: 1.03, boxShadow: '0 25px 60px -12px rgba(0,0,0,0.15)' }}
+                className={`relative bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
+                  plan.highlight ? `border-4 ${plan.borderColor} shadow-2xl ${plan.glowColor}` : `border-2 border-gray-200 ${plan.bgHover} hover:shadow-xl hover:${plan.glowColor}`
+                }`}
+              >
+                {plan.badge && (
+                  <motion.div
+                    className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-1.5 rounded-bl-xl text-sm font-semibold"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {plan.badge}
+                  </motion.div>
+                )}
+
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${plan.color === 'purple' ? 'bg-purple-100' : plan.color === 'indigo' ? 'bg-indigo-100' : 'bg-blue-100'}`}>
+                    <motion.div
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${
+                        plan.color === 'purple' ? 'bg-purple-100' : plan.color === 'indigo' ? 'bg-indigo-100' : 'bg-blue-100'
+                      }`}
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
                       <plan.icon className={`w-6 h-6 ${plan.color === 'purple' ? 'text-purple-600' : plan.color === 'indigo' ? 'text-indigo-600' : 'text-blue-600'}`} />
-                    </div>
+                    </motion.div>
                     <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
                   </div>
+
                   <p className="text-gray-600 mb-6">{plan.description}</p>
-                  <div className="mb-6"><span className="text-5xl font-bold text-gray-900">{plan.price}</span><span className="text-gray-600 text-lg">{plan.period}</span></div>
-                  <Link href={plan.price === 'Özel' ? '#contact' : '/register'}
-                    className={`block w-full py-3 rounded-lg font-semibold text-center transition-all ${plan.highlight ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'}`}>
-                    {plan.price === 'Özel' ? 'İletişime Geçin' : '5 Gün Ücretsiz Deneyin'}
-                  </Link>
-                  <div className="mt-8 space-y-4">
+
+                  <div className="mb-6">
+                    <span className="text-5xl font-bold text-gray-900">{plan.price}</span>
+                    <span className="text-gray-600 text-lg">{plan.period}</span>
+                  </div>
+
+                  <motion.button
+                    onClick={() => handleBuy(plan.id)}
+                    disabled={loading === plan.id}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`w-full py-3.5 rounded-xl font-semibold transition-all disabled:opacity-50 ${
+                      plan.highlight
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                        : plan.id === 'enterprise'
+                          ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    {loading === plan.id ? (
+                      <span className="inline-flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span> İşleniyor...</span>
+                    ) : plan.id === 'enterprise' ? 'İletişime Geçin' : !user ? 'Giriş Yap ve Satın Al' : '5 Gün Ücretsiz Deneyin'}
+                  </motion.button>
+
+                  {!user && plan.id !== 'enterprise' && (
+                    <p className="text-xs text-gray-400 text-center mt-2">Satın almak için giriş yapmanız gerekiyor</p>
+                  )}
+
+                  <div className="mt-8 space-y-3">
                     {plan.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + idx * 0.05 }}
+                        className="flex items-start gap-3"
+                      >
                         <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${plan.highlight ? 'text-purple-600' : 'text-blue-600'}`} />
-                        <span className="text-gray-700">{feature}</span>
-                      </div>
+                        <span className="text-gray-700 text-sm">{feature}</span>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
@@ -109,13 +219,11 @@ export default function PricingPage() {
             <p className="text-xl text-gray-600">Premium özellikler her pakette</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <motion.div key={index} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: index * 0.1 }} viewport={{ once: true }}
+            {allFeatures.map((f, i) => (
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: i * 0.1 }} viewport={{ once: true }}
                 className="flex items-start gap-4 p-6 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg flex-shrink-0">
-                  <feature.icon className="w-6 h-6 text-blue-600" />
-                </div>
-                <div><h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3><p className="text-gray-600">{feature.description}</p></div>
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg flex-shrink-0"><f.icon className="w-6 h-6 text-blue-600" /></div>
+                <div><h3 className="text-lg font-semibold text-gray-900 mb-2">{f.title}</h3><p className="text-gray-600">{f.description}</p></div>
               </motion.div>
             ))}
           </div>
@@ -130,24 +238,32 @@ export default function PricingPage() {
             <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6"><Shield className="w-10 h-10 text-green-600" /></div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">%100 Para İade Garantisi</h2>
             <p className="text-xl text-gray-600 mb-8">5 gün içinde beğenmezseniz, hiçbir soru sormadan paranızı iade ediyoruz.</p>
-            <Link href="/register" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-lg hover:shadow-lg text-lg font-semibold inline-flex items-center gap-2">
+            <motion.button onClick={() => handleBuy('starter')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-lg hover:shadow-lg text-lg font-semibold inline-flex items-center gap-2">
               <Zap className="w-5 h-5" /> Hemen Başlayın
-            </Link>
+            </motion.button>
           </motion.div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Sorularınız mı var?</h2>
-          <p className="text-xl text-gray-600 mb-8">Fiyatlandırma ve özellikler hakkında detaylı bilgi almak için ekibimizle iletişime geçin.</p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/faq" className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 text-lg">SSS</Link>
-            <Link href="/register" className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 text-lg">Demo Talep Et</Link>
-          </div>
+      {/* iyzico Checkout Modal */}
+      {showCheckout && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative"
+          >
+            <button onClick={() => setShowCheckout(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 z-10">
+              <X className="w-5 h-5" />
+            </button>
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Güvenli Ödeme</h3>
+              <div ref={checkoutRef} id="iyzipay-checkout-form"></div>
+            </div>
+          </motion.div>
         </div>
-      </section>
+      )}
     </div>
   );
 }
