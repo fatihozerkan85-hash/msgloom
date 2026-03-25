@@ -21,7 +21,8 @@ const keyLabels = {
   title: 'Başlık', subtitle: 'Alt Başlık', description: 'Açıklama', brand: 'Marka Adı',
   cta_primary: 'Ana Buton', cta_secondary: 'İkinci Buton', badge: 'Rozet',
   title_highlight: 'Vurgulu Başlık', link1: 'Link 1', link2: 'Link 2', link3: 'Link 3', link4: 'Link 4 (Nasıl Çalışır)',
-  login: 'Giriş Butonu', register: 'Kayıt Butonu', cta: 'CTA Butonu',
+  link_crm: 'CRM Linki', link_pricing: 'Fiyatlandırma Linki',
+  login: 'Giriş Butonu', register: 'Kayıt Butonu', dashboard: 'Yönetim Paneli Butonu', cta: 'CTA Butonu',
   card1_title: 'Kart 1 Başlık', card1_desc: 'Kart 1 Açıklama',
   card2_title: 'Kart 2 Başlık', card2_desc: 'Kart 2 Açıklama',
   card3_title: 'Kart 3 Başlık', card3_desc: 'Kart 3 Açıklama',
@@ -51,10 +52,13 @@ const keyLabels = {
   ig_badge: 'Instagram Rozet', ig_title: 'Instagram Başlık', ig_desc: 'Instagram Açıklama',
   ig_feat_title: 'Instagram Özellik Başlık', ig_feat1: 'IG Özellik 1', ig_feat2: 'IG Özellik 2', ig_feat3: 'IG Özellik 3', ig_feat4: 'IG Özellik 4',
   // Footer
-  desc: 'Açıklama', col1_title: 'Kolon 1 Başlık', col1_link1: 'Kolon 1 Link 1', col1_link2: 'Kolon 1 Link 2', col1_link3: 'Kolon 1 Link 3',
-  col2_title: 'Kolon 2 Başlık', col2_link1: 'Kolon 2 Link 1', col2_link2: 'Kolon 2 Link 2', col2_link3: 'Kolon 2 Link 3',
-  col3_title: 'Kolon 3 Başlık', col3_link1: 'Kolon 3 Link 1', col3_link2: 'Kolon 3 Link 2', col3_link3: 'Kolon 3 Link 3',
-  copyright: 'Telif Hakkı',
+  desc: 'Açıklama', social_title: 'Sosyal Medya Başlık', qr_title: 'QR Başlık', qr_desc: 'QR Açıklama',
+  col_product_title: 'Ürün Kolon Başlık', col_product_link1: 'Ürün Link 1', col_product_link2: 'Ürün Link 2', col_product_link3: 'Ürün Link 3', col_product_link4: 'Ürün Link 4',
+  col1_title: 'Kurumsal Başlık', col1_link1: 'Hakkımızda', col1_link2: 'Blog', col1_link3: 'Özellikler', col1_link4: 'S.S.S.', col1_link5: 'İletişim',
+  col2_title: 'Yasal Başlık', col2_link1: 'Mesafeli Satış', col2_link2: 'İptal ve İade', col2_link3: 'KVKK', col2_link4: 'Gizlilik', col2_link5: 'Çerez', col2_link6: 'Bilgi Güvenliği', col2_link7: 'Kullanım Koşulları',
+  col3_title: 'İletişim Başlık', col3_line1: 'E-posta', col3_line2: 'Adres', col3_line3: 'Telefon', col3_payments: 'Ödeme Yöntemleri',
+  payment_title: 'Ödeme Başlık', payment_ssl: 'SSL Açıklama',
+  copyright: 'Telif Hakkı', copyright_privacy: 'Gizlilik Linki', copyright_terms: 'Kullanım Koşulları Linki',
 };
 
 function isAdminAuthenticated() {

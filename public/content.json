@@ -5,8 +5,11 @@
     "link2": "Avantajlar",
     "link3": "İletişim",
     "link4": "Nasıl Çalışır",
+    "link_crm": "CRM",
+    "link_pricing": "Fiyatlandırma",
     "login": "Giriş Yap",
-    "register": "Başlayın"
+    "register": "Başlayın",
+    "dashboard": "Yönetim Paneli"
   },
   "hero": {
     "title": "WhatsApp & Telegram & Instagram Mesajlaşma Yönetimi",
@@ -169,11 +172,20 @@
   },
   "footer": {
     "desc": "WhatsApp & Telegram mesajlaşma yönetiminde güvenilir çözüm ortağınız.",
+    "social_title": "Bizi Takip Edin",
+    "qr_title": "Hızlı Erişim",
+    "qr_desc": "QR kodu okutarak hemen başlayın",
+    "col_product_title": "ÜRÜN",
+    "col_product_link1": "Özellikler",
+    "col_product_link2": "Nasıl Çalışır",
+    "col_product_link3": "Fiyatlandırma",
+    "col_product_link4": "Demo",
     "col1_title": "KURUMSAL",
     "col1_link1": "Hakkımızda",
     "col1_link2": "Blog",
     "col1_link3": "Özellikler",
     "col1_link4": "S.S.S.",
+    "col1_link5": "İletişim",
     "col2_title": "YASAL METİNLER",
     "col2_link1": "Mesafeli Satış Sözleşmesi",
     "col2_link2": "İptal ve İade Koşulları",
@@ -187,6 +199,10 @@
     "col3_line2": "Adres: İstanbul/Türkiye",
     "col3_line3": "Tel: +90 850 000 00 00",
     "col3_payments": "Visa / Mastercard / iyzico",
-    "copyright": "© 2026 MsgLoom. Tüm hakları saklıdır."
+    "payment_title": "Güvenli Ödeme Yöntemleri",
+    "payment_ssl": "256-bit SSL şifreleme ile güvenli ödeme",
+    "copyright": "© 2026 MsgLoom. Tüm hakları saklıdır.",
+    "copyright_privacy": "Gizlilik Politikası",
+    "copyright_terms": "Kullanım Koşulları"
   }
 }

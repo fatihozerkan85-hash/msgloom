@@ -37,13 +37,13 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link1')}</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link4')}</a>
-              <Link href="/crm-features" className="text-gray-700 hover:text-blue-600">CRM</Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-blue-600">Fiyatlandırma</Link>
+              <Link href="/crm-features" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link_crm')}</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link_pricing')}</Link>
               <a href="#contact" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link3')}</a>
               {user ? (
                 <>
                   <Link href="/dashboard" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium text-sm">
-                    Yönetim Paneli
+                    {t(c,'navbar','dashboard')}
                   </Link>
                   <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-semibold text-sm">
@@ -429,7 +429,7 @@ export default function Home() {
 
               {/* Social Media */}
               <div className="mb-6">
-                <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider">Bizi Takip Edin</h4>
+                <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider">{t(c,'footer','social_title')}</h4>
                 <div className="flex gap-3 flex-wrap">
                   {[
                     { href: 'https://wa.me/message/YOURWHATSAPPNUMBER', svg: <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="white" />, svg2: <path d="M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.652c1.746.943 3.71 1.444 5.71 1.444h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.48-8.447zm-8.475 18.297c-1.774 0-3.513-.479-5.031-1.378l-.361-.214-3.741.98.998-3.648-.235-.374a9.86 9.86 0 01-1.511-5.26c.002-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.886-9.888 9.886z" fill="white" /> },
@@ -452,8 +452,8 @@ export default function Home() {
                 <div className="flex items-center gap-4">
                   <div className="bg-white p-3 rounded-lg"><QrCode className="w-16 h-16 text-gray-900" /></div>
                   <div>
-                    <h4 className="font-semibold text-sm mb-1">Hızlı Erişim</h4>
-                    <p className="text-xs text-gray-400">QR kodu okutarak hemen başlayın</p>
+                    <h4 className="font-semibold text-sm mb-1">{t(c,'footer','qr_title')}</h4>
+                    <p className="text-xs text-gray-400">{t(c,'footer','qr_desc')}</p>
                   </div>
                 </div>
               </div>
@@ -461,12 +461,12 @@ export default function Home() {
 
             {/* Ürün */}
             <div>
-              <h4 className="font-semibold mb-4">Ürün</h4>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col_product_title')}</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">{t(c,'footer','col1_link3')}</a></li>
-                <li><a href="#how-it-works" className="hover:text-white transition-colors">Nasıl Çalışır</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Fiyatlandırma</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">{t(c,'footer','col_product_link1')}</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">{t(c,'footer','col_product_link2')}</a></li>
+                <li><Link href="/pricing" className="hover:text-white transition-colors">{t(c,'footer','col_product_link3')}</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t(c,'footer','col_product_link4')}</a></li>
               </ul>
             </div>
 
@@ -476,7 +476,7 @@ export default function Home() {
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/about" className="hover:text-white transition-colors">{t(c,'footer','col1_link1')}</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">{t(c,'footer','col1_link2')}</a></li>
-                <li><a href="#contact" className="hover:text-white transition-colors">İletişim</a></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">{t(c,'footer','col1_link5')}</a></li>
                 <li><Link href="/faq" className="hover:text-white transition-colors">{t(c,'footer','col1_link4')}</Link></li>
               </ul>
             </div>
@@ -500,7 +500,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-6">
               <div className="flex items-center gap-3">
                 <CreditCard className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-400 font-semibold">Güvenli Ödeme Yöntemleri</span>
+                <span className="text-sm text-gray-400 font-semibold">{t(c,'footer','payment_title')}</span>
               </div>
               <div className="flex items-center gap-4 flex-wrap justify-center">
                 <motion.div className="w-20 h-16 rounded-lg flex items-center justify-center group" whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}>
@@ -516,7 +516,7 @@ export default function Home() {
                   <span className="text-xl font-black text-white" style={{ letterSpacing: '0.05em' }}>TROY</span>
                 </motion.div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-2">256-bit SSL şifreleme ile güvenli ödeme</p>
+              <p className="text-xs text-gray-500 text-center mt-2">{t(c,'footer','payment_ssl')}</p>
             </div>
           </div>
 
@@ -524,8 +524,8 @@ export default function Home() {
           <div className="border-t border-gray-800 pt-8 text-center">
             <p className="text-gray-400 text-sm">
               {t(c,'footer','copyright')} •
-              <Link href="/privacy" className="hover:text-white ml-1">Gizlilik Politikası</Link> •
-              <Link href="/usage-terms" className="hover:text-white ml-1">Kullanım Koşulları</Link>
+              <Link href="/privacy" className="hover:text-white ml-1">{t(c,'footer','copyright_privacy')}</Link> •
+              <Link href="/usage-terms" className="hover:text-white ml-1">{t(c,'footer','copyright_terms')}</Link>
             </p>
           </div>
         </div>
