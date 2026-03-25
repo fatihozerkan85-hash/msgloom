@@ -68,7 +68,7 @@ function VerifyContent() {
         body: JSON.stringify({ email, code: fullCode }),
       });
       const data = await res.json();
-      if (data.success) router.push('/dashboard');
+      if (data.success) router.push('/');
       else setError(data.error);
     } catch { setError('Bir hata oluştu'); }
     setLoading(false);

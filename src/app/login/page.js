@@ -24,7 +24,7 @@ function LoginContent() {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (data.success) router.push(redirect || '/dashboard');
+    if (data.success) router.push(redirect || '/');
     else if (data.needsVerification) router.push(`/verify?email=${encodeURIComponent(data.email)}`);
     else setError(data.error);
     setLoading(false);

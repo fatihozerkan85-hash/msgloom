@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, TrendingUp, ArrowRight, Rocket, Clock, CheckCircle2, BadgeCheck, QrCode, CreditCard } from 'lucide-react';
@@ -12,16 +11,16 @@ import { HowItWorks } from '@/components/HowItWorks';
 import { useContent, t } from '@/lib/useContent';
 
 export default function Home() {
-  const router = useRouter();
+  const [user, setUser] = useState(null);
   const [checking, setChecking] = useState(true);
   const { content: c } = useContent();
 
   useEffect(() => {
     fetch('/api/auth/me')
       .then(res => res.json())
-      .then(data => { if (data.user) router.push('/dashboard'); else setChecking(false); })
+      .then(data => { if (data.user) setUser(data.user); setChecking(false); })
       .catch(() => setChecking(false));
-  }, [router]);
+  }, []);
 
   if (checking) return <div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
 
@@ -41,10 +40,29 @@ export default function Home() {
               <Link href="/crm-features" className="text-gray-700 hover:text-blue-600">CRM</Link>
               <Link href="/pricing" className="text-gray-700 hover:text-blue-600">Fiyatlandırma</Link>
               <a href="#contact" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link3')}</a>
-              <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium">{t(c,'navbar','login')}</Link>
-              <Link href="/register" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                {t(c,'navbar','register')}
-              </Link>
+              {user ? (
+                <>
+                  <Link href="/dashboard" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium text-sm">
+                    Yönetim Paneli
+                  </Link>
+                  <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-semibold text-sm">
+                      {(user.name || user.email || '?')[0].toUpperCase()}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-gray-900 leading-tight">{user.name || user.email}</p>
+                      {user.company && <p className="text-xs text-gray-500 leading-tight">{user.company}</p>}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium">{t(c,'navbar','login')}</Link>
+                  <Link href="/register" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    {t(c,'navbar','register')}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
