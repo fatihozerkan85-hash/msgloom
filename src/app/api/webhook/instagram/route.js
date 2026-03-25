@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { getAutoReply } from '@/lib/autoReply';
 
 const IG_API = 'https://graph.facebook.com/v21.0';
 
@@ -71,38 +72,7 @@ export async function POST(request) {
         // Otomasyon
         if (!text) continue;
 
-        const automations = await sql`
-          SELECT * FROM automations 
-          WHERE user_id = ${userId} AND is_active = true AND (platform = 'all' OR platform = 'instagram')
-          ORDER BY priority DESC, created_at ASC
-        `;
-
-        if (automations.length === 0) continue;
-
-        const incomingText = text.toLowerCase().trim();
-
-        const [prev] = await sql`
-          SELECT COUNT(*) as count FROM messages WHERE user_id = ${userId} AND contact_id = ${senderId} AND platform = 'instagram' AND direction = 'incoming'
-        `;
-        const isFirst = Number(prev.count) <= 1;
-
-        let responseText = null;
-
-        if (isFirst) {
-          const w = automations.find(a => a.type === 'welcome');
-          if (w) responseText = w.response_text;
-        }
-        if (!responseText) {
-          const kw = automations.find(a => {
-            if (a.type !== 'keyword' || !a.trigger_text) return false;
-            return a.trigger_text.toLowerCase().split(',').map(k => k.trim()).some(k => incomingText.includes(k));
-          });
-          if (kw) responseText = kw.response_text;
-        }
-        if (!responseText) {
-          const d = automations.find(a => a.type === 'default');
-          if (d) responseText = d.response_text;
-        }
+        const responseText = await getAutoReply(userId, text, 'instagram', senderId);
 
         if (responseText) {
           try {

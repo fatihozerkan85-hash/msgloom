@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import axios from 'axios';
+import { getAutoReply } from '@/lib/autoReply';
 
 const TG_API = 'https://api.telegram.org/bot';
 
@@ -47,41 +48,7 @@ export async function POST(request) {
     // Otomasyon
     if (!text) return Response.json({ ok: true });
 
-    const automations = await sql`
-      SELECT * FROM automations 
-      WHERE user_id = ${userId} AND is_active = true AND (platform = 'all' OR platform = 'telegram')
-      ORDER BY priority DESC, created_at ASC
-    `;
-
-    if (automations.length === 0) return Response.json({ ok: true });
-
-    const incomingText = text.toLowerCase().trim();
-
-    // İlk mesaj mı?
-    const [prev] = await sql`
-      SELECT COUNT(*) as count FROM messages WHERE user_id = ${userId} AND contact_id = ${chatId} AND platform = 'telegram' AND direction = 'incoming'
-    `;
-    const isFirst = Number(prev.count) <= 1;
-
-    let responseText = null;
-
-    if (isFirst) {
-      const w = automations.find(a => a.type === 'welcome');
-      if (w) responseText = w.response_text;
-    }
-
-    if (!responseText) {
-      const kw = automations.find(a => {
-        if (a.type !== 'keyword' || !a.trigger_text) return false;
-        return a.trigger_text.toLowerCase().split(',').map(k => k.trim()).some(k => incomingText.includes(k));
-      });
-      if (kw) responseText = kw.response_text;
-    }
-
-    if (!responseText) {
-      const d = automations.find(a => a.type === 'default');
-      if (d) responseText = d.response_text;
-    }
+    const responseText = await getAutoReply(userId, text, 'telegram', chatId);
 
     if (responseText) {
       try {

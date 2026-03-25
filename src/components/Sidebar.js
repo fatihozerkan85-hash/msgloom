@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut, FileText, Zap, Megaphone, UserCircle } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut, FileText, Zap, Megaphone, UserCircle, Package } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
@@ -9,6 +9,7 @@ const menuItems = [
   { id: 'broadcast', label: 'Toplu Mesaj', Icon: Megaphone },
   { id: 'contacts', label: 'Kişiler', Icon: Users },
   { id: 'crm', label: 'CRM', Icon: UserCircle },
+  { id: 'products', label: 'Ürünler', Icon: Package },
   { id: 'automations', label: 'Otomasyonlar', Icon: Zap },
   { id: 'settings', label: 'Ayarlar', Icon: Settings },
 ];
