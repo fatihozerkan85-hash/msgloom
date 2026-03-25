@@ -20,7 +20,7 @@ export async function POST(request) {
     const token = formData.get('token');
 
     if (!token) {
-      return NextResponse.redirect(new URL('/pricing?status=error', request.url));
+      return NextResponse.redirect(new URL('/payment-result?status=error', request.url));
     }
 
     return new Promise((resolve) => {
@@ -28,26 +28,23 @@ export async function POST(request) {
         try {
           if (err || result.status !== 'success' || result.paymentStatus !== 'SUCCESS') {
             console.error('Payment failed:', err || result);
-            resolve(NextResponse.redirect(new URL('/pricing?status=failed', request.url)));
+            resolve(NextResponse.redirect(new URL('/payment-result?status=failed', request.url)));
             return;
           }
 
-          // conversationId: "userId-planId-timestamp"
           const parts = result.conversationId?.split('-') || [];
           const userId = parts[0];
           const planId = parts[1];
 
           if (!userId || !planId) {
-            resolve(NextResponse.redirect(new URL('/pricing?status=error', request.url)));
+            resolve(NextResponse.redirect(new URL('/payment-result?status=error', request.url)));
             return;
           }
 
           const sql = neon(process.env.POSTGRES_URL);
 
-          // Kullanıcının planını güncelle
           await sql`UPDATE users SET plan = ${planId} WHERE id = ${parseInt(userId)}`;
 
-          // Ödeme kaydı
           await sql`CREATE TABLE IF NOT EXISTS payments (
             id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, plan VARCHAR(50),
             amount DECIMAL(12,2), currency VARCHAR(5) DEFAULT 'TRY',
@@ -58,15 +55,15 @@ export async function POST(request) {
           await sql`INSERT INTO payments (user_id, plan, amount, iyzico_payment_id, status)
             VALUES (${parseInt(userId)}, ${planId}, ${result.paidPrice}, ${result.paymentId}, 'success')`;
 
-          resolve(NextResponse.redirect(new URL('/dashboard?payment=success', request.url)));
+          resolve(NextResponse.redirect(new URL(`/payment-result?status=success&plan=${planId}&amount=${result.paidPrice}`, request.url)));
         } catch (dbErr) {
           console.error('DB error after payment:', dbErr);
-          resolve(NextResponse.redirect(new URL('/pricing?status=error', request.url)));
+          resolve(NextResponse.redirect(new URL('/payment-result?status=error', request.url)));
         }
       });
     });
   } catch (error) {
     console.error('Payment callback error:', error);
-    return NextResponse.redirect(new URL('/pricing?status=error', request.url));
+    return NextResponse.redirect(new URL('/payment-result?status=error', request.url));
   }
 }
