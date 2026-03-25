@@ -29,6 +29,11 @@ export default function Sidebar({ activePage, setActivePage, user, onLogout }) {
           <p className="text-sm font-medium text-gray-900 truncate">{user?.name || user?.email}</p>
           <p className="text-xs text-gray-500 truncate">{user?.company || user?.email}</p>
           <span className="inline-block mt-1.5 px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span>
+          {user?.daysLeft !== null && user?.daysLeft !== undefined && (
+            <span className={`inline-block ml-1 mt-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full ${user.daysLeft <= 2 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+              {user.daysLeft} gün kaldı
+            </span>
+          )}
         </div>
       </div>
 

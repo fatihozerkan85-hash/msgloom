@@ -79,6 +79,8 @@ export async function POST(request) {
     await sql`ALTER TABLE messages ADD COLUMN IF NOT EXISTS contact_id VARCHAR(100)`;
     await sql`ALTER TABLE messages ADD COLUMN IF NOT EXISTS contact_name VARCHAR(255)`;
     await sql`ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_url TEXT`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
 
     return Response.json({ success: true, message: 'Tüm tablolar hazır' });
   } catch (error) {

@@ -43,7 +43,10 @@ export async function POST(request) {
 
           const sql = neon(process.env.POSTGRES_URL);
 
-          await sql`UPDATE users SET plan = ${planId} WHERE id = ${parseInt(userId)}`;
+          // Kullanıcının planını güncelle — 30 gün süre
+          const planExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+          await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
+          await sql`UPDATE users SET plan = ${planId}, plan_expires_at = ${planExpires} WHERE id = ${parseInt(userId)}`;
 
           await sql`CREATE TABLE IF NOT EXISTS payments (
             id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, plan VARCHAR(50),

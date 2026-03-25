@@ -39,10 +39,13 @@ export async function POST(request) {
         WHERE id = ${existing.id}
       `;
     } else {
-      // Create new user
+      // Create new user — 5 gün trial
+      const trialEnds = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+      await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP`;
+      await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
       await sql`
-        INSERT INTO users (email, password_hash, name, company, verification_code, verification_expires, email_verified)
-        VALUES (${email}, ${password_hash}, ${name || null}, ${company || null}, ${code}, ${expires}, false)
+        INSERT INTO users (email, password_hash, name, company, verification_code, verification_expires, email_verified, plan, trial_ends_at)
+        VALUES (${email}, ${password_hash}, ${name || null}, ${company || null}, ${code}, ${expires}, false, 'trial', ${trialEnds})
       `;
     }
 
