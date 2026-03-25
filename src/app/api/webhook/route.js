@@ -48,9 +48,17 @@ export async function POST(request) {
         for (const message of change.value.messages) {
           // Mesajı kaydet
           await sql`
-            INSERT INTO messages (user_id, direction, phone, type, text_body, wa_message_id, raw_data)
-            VALUES (${userId}, 'incoming', ${message.from}, ${message.type}, ${message.text?.body || null}, ${message.id}, ${JSON.stringify(message)})
+            INSERT INTO messages (user_id, direction, phone, type, text_body, wa_message_id, raw_data, platform, contact_id)
+            VALUES (${userId}, 'incoming', ${message.from}, ${message.type}, ${message.text?.body || null}, ${message.id}, ${JSON.stringify(message)}, 'whatsapp', ${message.from})
           `;
+
+          // Kişiyi güncelle
+          await sql`
+            INSERT INTO contacts (user_id, platform, platform_contact_id, phone, last_message_at, message_count)
+            VALUES (${userId}, 'whatsapp', ${message.from}, ${message.from}, NOW(), 1)
+            ON CONFLICT (user_id, platform, platform_contact_id) 
+            DO UPDATE SET last_message_at = NOW(), message_count = contacts.message_count + 1
+          `.catch(() => {});
 
           // Sadece text mesajlara otomatik yanıt ver
           if (message.type !== 'text' || !message.text?.body) continue;
@@ -60,7 +68,7 @@ export async function POST(request) {
           // Kullanıcının otomasyon kurallarını al
           const automations = await sql`
             SELECT * FROM automations 
-            WHERE user_id = ${userId} AND is_active = true 
+            WHERE user_id = ${userId} AND is_active = true AND (platform = 'all' OR platform = 'whatsapp')
             ORDER BY priority DESC, created_at ASC
           `;
 

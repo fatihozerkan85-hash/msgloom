@@ -33,7 +33,7 @@ export async function POST(request) {
   if (!user) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
 
   try {
-    const { type, trigger_text, response_text } = await request.json();
+    const { type, trigger_text, response_text, platform } = await request.json();
 
     if (!response_text) {
       return Response.json({ error: 'Yanıt metni gerekli' }, { status: 400 });
@@ -60,8 +60,8 @@ export async function POST(request) {
     const priority = type === 'welcome' ? 100 : type === 'default' ? -1 : 0;
 
     const [automation] = await sql`
-      INSERT INTO automations (user_id, type, trigger_text, response_text, priority)
-      VALUES (${user.id}, ${type}, ${trigger_text || null}, ${response_text}, ${priority})
+      INSERT INTO automations (user_id, type, trigger_text, response_text, priority, platform)
+      VALUES (${user.id}, ${type}, ${trigger_text || null}, ${response_text}, ${priority}, ${platform || 'all'})
       RETURNING *
     `;
 

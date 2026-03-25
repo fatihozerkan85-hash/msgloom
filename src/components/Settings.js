@@ -1,192 +1,118 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MessageSquare, Smartphone, Plus, Bot, Trash2, CheckCircle, XCircle, Wifi } from 'lucide-react';
+import { MessageSquare, Smartphone, Plus, Trash2, CheckCircle, XCircle, Wifi, Send as SendIcon } from 'lucide-react';
 
 const FB_APP_ID = '949647074467565';
 
 export default function Settings({ user }) {
-  const [accounts, setAccounts] = useState([]);
+  const [waAccounts, setWaAccounts] = useState([]);
+  const [channels, setChannels] = useState([]);
   const [status, setStatus] = useState(null);
-  const [showManual, setShowManual] = useState(false);
-  const [form, setForm] = useState({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
-  const [adding, setAdding] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
+  const [showTgForm, setShowTgForm] = useState(false);
+  const [showIgForm, setShowIgForm] = useState(false);
+  const [showWaManual, setShowWaManual] = useState(false);
+  const [tgToken, setTgToken] = useState('');
+  const [igForm, setIgForm] = useState({ page_id: '', access_token: '' });
+  const [waForm, setWaForm] = useState({ phone_number_id: '', access_token: '' });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch('/api/account/whatsapp')
-      .then(res => res.json())
-      .then(data => setAccounts(data.accounts || []))
-      .catch(() => {});
+    fetch('/api/account/whatsapp').then(r => r.json()).then(d => setWaAccounts(d.accounts || [])).catch(() => {});
+    fetch('/api/account/channels').then(r => r.json()).then(d => setChannels(d.channels || [])).catch(() => {});
   }, []);
 
-  // Facebook SDK yükle
+  // Facebook SDK
   useEffect(() => {
-    if (document.getElementById('facebook-jssdk')) {
-      setSdkReady(true);
-      return;
-    }
-
+    if (document.getElementById('facebook-jssdk')) { setSdkReady(true); return; }
     window.fbAsyncInit = function () {
-      window.FB.init({
-        appId: FB_APP_ID,
-        autoLogAppEvents: true,
-        xfbml: false,
-        version: 'v21.0'
-      });
+      window.FB.init({ appId: FB_APP_ID, autoLogAppEvents: true, xfbml: false, version: 'v21.0' });
       setSdkReady(true);
     };
-
-    const script = document.createElement('script');
-    script.id = 'facebook-jssdk';
-    script.src = 'https://connect.facebook.net/en_US/sdk.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+    const s = document.createElement('script');
+    s.id = 'facebook-jssdk'; s.src = 'https://connect.facebook.net/en_US/sdk.js'; s.async = true; s.defer = true;
+    document.body.appendChild(s);
   }, []);
 
-  const handleEmbeddedSignup = useCallback(() => {
-    if (!window.FB) {
-      setStatus({ type: 'error', text: 'Facebook SDK yüklenemedi. Sayfayı yenileyin.' });
-      return;
-    }
-
-    setConnecting(true);
-    setStatus(null);
-
-    window.FB.login(
-      function (response) {
-        if (response.authResponse) {
-          const code = response.authResponse.code;
-
-          // sessionInfoListener'dan gelen bilgileri kullan
-          // Eğer listener tetiklenmezse, code ile backend'e gönder
-          if (code && window.__wa_signup_data) {
-            exchangeToken(code, window.__wa_signup_data.waba_id, window.__wa_signup_data.phone_number_id);
-          } else if (code) {
-            // Code var ama signup data yok — kullanıcıya bilgi ver
-            setStatus({ type: 'error', text: 'WhatsApp bilgileri alınamadı. Lütfen tekrar deneyin.' });
-            setConnecting(false);
-          }
-        } else {
-          setStatus({ type: 'error', text: 'Facebook girişi iptal edildi' });
-          setConnecting(false);
-        }
-      },
-      {
-        config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '',
-        response_type: 'code',
-        override_default_response_type: true,
-        extras: {
-          setup: {},
-          featureType: '',
-          sessionInfoVersion: 2,
-        }
-      }
-    );
-  }, []);
-
-  // Session info listener — Embedded Signup tamamlandığında tetiklenir
   useEffect(() => {
-    const listener = (event) => {
-      if (!event.origin.includes('facebook.com')) return;
+    const listener = (e) => {
+      if (!e.origin.includes('facebook.com')) return;
       try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'WA_EMBEDDED_SIGNUP') {
-          if (data.event === 'FINISH') {
-            window.__wa_signup_data = {
-              phone_number_id: data.data?.phone_number_id,
-              waba_id: data.data?.waba_id,
-            };
-          }
+        const d = JSON.parse(e.data);
+        if (d.type === 'WA_EMBEDDED_SIGNUP' && d.event === 'FINISH') {
+          window.__wa_signup_data = { phone_number_id: d.data?.phone_number_id, waba_id: d.data?.waba_id };
         }
       } catch {}
     };
-
     window.addEventListener('message', listener);
     return () => window.removeEventListener('message', listener);
   }, []);
 
-  const exchangeToken = async (code, wabaId, phoneNumberId) => {
+  const handleEmbeddedSignup = useCallback(() => {
+    if (!window.FB) { setStatus({ type: 'error', text: 'Facebook SDK yüklenemedi' }); return; }
+    setConnecting(true); setStatus(null);
+    window.FB.login(function (r) {
+      if (r.authResponse?.code && window.__wa_signup_data) {
+        exchangeWaToken(r.authResponse.code, window.__wa_signup_data.waba_id, window.__wa_signup_data.phone_number_id);
+      } else { setStatus({ type: 'error', text: 'Bağlantı iptal edildi' }); setConnecting(false); }
+    }, { config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '', response_type: 'code', override_default_response_type: true, extras: { setup: {}, featureType: '', sessionInfoVersion: 2 } });
+  }, []);
+
+  const exchangeWaToken = async (code, wabaId, phoneNumberId) => {
     try {
-      const res = await fetch('/api/account/whatsapp/exchange-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, waba_id: wabaId, phone_number_id: phoneNumberId }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAccounts(prev => {
-          const exists = prev.find(a => a.id === data.account.id);
-          if (exists) return prev.map(a => a.id === data.account.id ? data.account : a);
-          return [data.account, ...prev];
-        });
-        setStatus({ type: 'success', text: `WhatsApp bağlandı${data.account.display_name ? ': ' + data.account.display_name : ''}` });
-      } else {
-        setStatus({ type: 'error', text: data.error });
-      }
-    } catch {
-      setStatus({ type: 'error', text: 'Bağlantı hatası' });
-    }
-    setConnecting(false);
-    window.__wa_signup_data = null;
+      const r = await fetch('/api/account/whatsapp/exchange-token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, waba_id: wabaId, phone_number_id: phoneNumberId }) });
+      const d = await r.json();
+      if (d.success) { setWaAccounts(p => { const e = p.find(a => a.id === d.account.id); return e ? p.map(a => a.id === d.account.id ? d.account : a) : [d.account, ...p]; }); setStatus({ type: 'success', text: 'WhatsApp bağlandı' }); }
+      else setStatus({ type: 'error', text: d.error });
+    } catch { setStatus({ type: 'error', text: 'Bağlantı hatası' }); }
+    setConnecting(false); window.__wa_signup_data = null;
   };
 
-  const handleManualAdd = async (e) => {
-    e.preventDefault();
-    setStatus(null);
-    setAdding(true);
-    try {
-      const res = await fetch('/api/account/whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAccounts([data.account, ...accounts]);
-        setForm({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
-        setShowManual(false);
-        setStatus({ type: 'success', text: 'WhatsApp hesabı eklendi' });
-      } else {
-        setStatus({ type: 'error', text: data.error });
-      }
-    } catch {
-      setStatus({ type: 'error', text: 'Bağlantı hatası' });
-    }
-    setAdding(false);
+  const handleWaManual = async (e) => {
+    e.preventDefault(); setSaving(true); setStatus(null);
+    const r = await fetch('/api/account/whatsapp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(waForm) });
+    const d = await r.json();
+    if (d.success) { setWaAccounts([d.account, ...waAccounts]); setWaForm({ phone_number_id: '', access_token: '' }); setShowWaManual(false); setStatus({ type: 'success', text: 'WhatsApp eklendi' }); }
+    else setStatus({ type: 'error', text: d.error });
+    setSaving(false);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Bu WhatsApp hesabını silmek istediğinize emin misiniz?')) return;
-    try {
-      const res = await fetch('/api/account/whatsapp', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAccounts(accounts.filter(a => a.id !== id));
-        setStatus({ type: 'success', text: 'Hesap silindi' });
-      }
-    } catch {}
+  const handleTelegram = async (e) => {
+    e.preventDefault(); setSaving(true); setStatus(null);
+    const r = await fetch('/api/account/channels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ platform: 'telegram', token: tgToken }) });
+    const d = await r.json();
+    if (d.success) { setChannels([d.channel, ...channels]); setTgToken(''); setShowTgForm(false); setStatus({ type: 'success', text: `Telegram bağlandı: @${d.channel.display_name}` }); }
+    else setStatus({ type: 'error', text: d.error });
+    setSaving(false);
   };
 
-  const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+  const handleInstagram = async (e) => {
+    e.preventDefault(); setSaving(true); setStatus(null);
+    const r = await fetch('/api/account/channels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ platform: 'instagram', ...igForm }) });
+    const d = await r.json();
+    if (d.success) { setChannels([d.channel, ...channels]); setIgForm({ page_id: '', access_token: '' }); setShowIgForm(false); setStatus({ type: 'success', text: 'Instagram bağlandı' }); }
+    else setStatus({ type: 'error', text: d.error });
+    setSaving(false);
+  };
+
+  const deleteWa = async (id) => { if (!confirm('Silmek istediğinize emin misiniz?')) return; const r = await fetch('/api/account/whatsapp', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); if ((await r.json()).success) setWaAccounts(waAccounts.filter(a => a.id !== id)); };
+  const deleteChannel = async (id) => { if (!confirm('Silmek istediğinize emin misiniz?')) return; const r = await fetch('/api/account/channels', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); if ((await r.json()).success) setChannels(channels.filter(c => c.id !== id)); };
+
+  const tgChannels = channels.filter(c => c.platform === 'telegram');
+  const igChannels = channels.filter(c => c.platform === 'instagram');
 
   return (
     <div>
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Ayarlar</h2>
-        <p className="text-gray-500 text-sm mt-1">Hesap ve entegrasyon ayarlarınız</p>
+        <p className="text-gray-500 text-sm mt-1">Hesap ve kanal entegrasyonları</p>
       </div>
 
       {status && (
         <div className={`mb-6 p-4 rounded-xl text-sm flex items-center gap-2 ${status.type === 'success' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
-          {status.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <XCircle className="w-4 h-4 flex-shrink-0" />}
-          {status.text}
+          {status.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />} {status.text}
         </div>
       )}
 
@@ -194,123 +120,131 @@ export default function Settings({ user }) {
       <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
         <h3 className="font-bold text-gray-900 mb-4">Hesap Bilgileri</h3>
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Email</p>
-            <p className="text-sm font-medium text-gray-900">{user?.email}</p>
-          </div>
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Ad Soyad</p>
-            <p className="text-sm font-medium text-gray-900">{user?.name || '-'}</p>
-          </div>
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Şirket</p>
-            <p className="text-sm font-medium text-gray-900">{user?.company || '-'}</p>
-          </div>
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">Plan</p>
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span>
-          </div>
+          {[{ l: 'Email', v: user?.email }, { l: 'Ad Soyad', v: user?.name || '-' }, { l: 'Şirket', v: user?.company || '-' }].map(i => (
+            <div key={i.l} className="bg-gray-50 rounded-xl p-4"><p className="text-xs text-gray-500 mb-1">{i.l}</p><p className="text-sm font-medium text-gray-900">{i.v}</p></div>
+          ))}
+          <div className="bg-gray-50 rounded-xl p-4"><p className="text-xs text-gray-500 mb-1">Plan</p><span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full capitalize">{user?.plan || 'free'}</span></div>
         </div>
       </div>
 
-      {/* WhatsApp Bağlantısı */}
+      {/* ===== WHATSAPP ===== */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="font-bold text-gray-900">WhatsApp Hesapları</h3>
-            <p className="text-xs text-gray-500 mt-0.5">WhatsApp Business numaranızı bağlayın</p>
-          </div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"><MessageSquare className="w-4 h-4 text-green-600" /></div>
+          <div><h3 className="font-bold text-gray-900">WhatsApp</h3><p className="text-xs text-gray-500">WhatsApp Business API</p></div>
         </div>
 
-        {/* Bağlı hesaplar */}
-        {accounts.length > 0 && (
-          <div className="space-y-3 mb-6">
-            {accounts.map(acc => (
-              <div key={acc.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-4 h-4 text-green-700" strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{acc.display_name || acc.phone_number || acc.phone_number_id}</p>
-                    <p className="text-xs text-gray-500">{acc.phone_number ? acc.phone_number : `ID: ${acc.phone_number_id}`}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {acc.is_active ? '● Bağlı' : 'Pasif'}
-                  </span>
-                  <button onClick={() => handleDelete(acc.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Bağlantıyı kaldır">
-                    <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-                  </button>
-                </div>
-              </div>
-            ))}
+        {waAccounts.map(a => (
+          <div key={a.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl mb-3">
+            <div><p className="text-sm font-medium text-gray-900">{a.display_name || a.phone_number || a.phone_number_id}</p><p className="text-xs text-gray-500">ID: {a.phone_number_id}</p></div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">● Bağlı</span>
+              <button onClick={() => deleteWa(a.id)} className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"><Trash2 className="w-4 h-4" /></button>
+            </div>
           </div>
+        ))}
+
+        <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+          <button onClick={handleEmbeddedSignup} disabled={connecting || !sdkReady}
+            className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-green-200 disabled:opacity-50 inline-flex items-center gap-2">
+            {connecting ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> Bağlanıyor...</> : '🟢 WhatsApp Bağla'}
+          </button>
+          <p className="text-xs text-gray-500 mt-2">Facebook ile giriş yaparak bağlayın</p>
+        </div>
+
+        <button onClick={() => setShowWaManual(!showWaManual)} className="text-xs text-gray-400 hover:text-gray-600 mt-3 block">{showWaManual ? 'Kapat' : 'Manuel ekle →'}</button>
+        {showWaManual && (
+          <form onSubmit={handleWaManual} className="mt-2 border border-gray-200 rounded-xl p-4 space-y-2">
+            <input type="text" placeholder="Phone Number ID *" value={waForm.phone_number_id} onChange={e => setWaForm({ ...waForm, phone_number_id: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+            <input type="password" placeholder="Access Token *" value={waForm.access_token} onChange={e => setWaForm({ ...waForm, access_token: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+            <button type="submit" disabled={saving} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50">{saving ? 'Kaydediliyor...' : 'Kaydet'}</button>
+          </form>
         )}
+      </div>
 
-        {/* Embedded Signup Butonu */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 text-center">
-          <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Wifi className="w-7 h-7 text-green-600" strokeWidth={1.5} />
-          </div>
-          <h4 className="font-bold text-gray-900 mb-2">WhatsApp Numaranızı Bağlayın</h4>
-          <p className="text-sm text-gray-600 mb-4">Facebook hesabınızla giriş yapın, WhatsApp Business numaranızı seçin — 2 dakikada hazır.</p>
-          
-          <button
-            onClick={handleEmbeddedSignup}
-            disabled={connecting || !sdkReady}
-            className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-8 py-3.5 rounded-xl font-semibold text-base transition shadow-lg shadow-green-200 disabled:opacity-50 inline-flex items-center gap-2"
-          >
-            {connecting ? (
-              <><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> Bağlanıyor...</>
-            ) : (
-              <><svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp Bağla</>
-            )}
-          </button>
-
-          <p className="text-xs text-gray-400 mt-3">Facebook hesabınız üzerinden güvenli bağlantı</p>
+      {/* ===== TELEGRAM ===== */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"><SendIcon className="w-4 h-4 text-blue-600" /></div>
+          <div><h3 className="font-bold text-gray-900">Telegram</h3><p className="text-xs text-gray-500">Telegram Bot API</p></div>
         </div>
 
-        {/* Manuel ekleme (gelişmiş) */}
-        <div className="mt-4">
-          <button onClick={() => setShowManual(!showManual)} className="text-xs text-gray-400 hover:text-gray-600 transition">
-            {showManual ? 'Kapat' : 'Gelişmiş: Manuel API bilgisi ile ekle →'}
-          </button>
+        {tgChannels.map(c => (
+          <div key={c.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl mb-3">
+            <div><p className="text-sm font-medium text-gray-900">{c.display_name}</p><p className="text-xs text-gray-500">ID: {c.platform_id}</p></div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">● Bağlı</span>
+              <button onClick={() => deleteChannel(c.id)} className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"><Trash2 className="w-4 h-4" /></button>
+            </div>
+          </div>
+        ))}
 
-          {showManual && (
-            <form onSubmit={handleManualAdd} className="mt-3 border border-gray-200 rounded-xl p-4 space-y-3">
-              <p className="text-xs text-gray-500">Meta Business Suite → WhatsApp → API Setup sayfasından bilgilerinizi alın.</p>
-              <div className="grid md:grid-cols-2 gap-3">
-                <input type="text" placeholder="Phone Number ID *" value={form.phone_number_id} onChange={update('phone_number_id')}
-                  className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
-                <input type="text" placeholder="Business Account ID" value={form.business_account_id} onChange={update('business_account_id')}
-                  className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          {!showTgForm ? (
+            <div className="text-center">
+              <button onClick={() => setShowTgForm(true)} className="bg-[#0088cc] hover:bg-[#0077b5] text-white px-6 py-3 rounded-xl font-semibold transition inline-flex items-center gap-2">
+                🔵 Telegram Bot Bağla
+              </button>
+              <p className="text-xs text-gray-500 mt-2">@BotFather'dan aldığınız bot token'ı girin</p>
+            </div>
+          ) : (
+            <form onSubmit={handleTelegram} className="space-y-3">
+              <div className="bg-white border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
+                <p className="font-medium mb-1">Bot token nasıl alınır?</p>
+                <p>1. Telegram'da @BotFather'a gidin → 2. /newbot yazın → 3. Bot adı ve username belirleyin → 4. Verilen token'ı buraya yapıştırın</p>
               </div>
-              <input type="password" placeholder="Access Token *" value={form.access_token} onChange={update('access_token')}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
-              <div className="flex gap-3">
-                <button type="submit" disabled={adding} className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition">
-                  {adding ? 'Doğrulanıyor...' : 'Kaydet'}
-                </button>
-                <button type="button" onClick={() => setShowManual(false)} className="text-gray-500 px-5 py-2 rounded-xl text-sm hover:bg-gray-100 transition">İptal</button>
+              <input type="text" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz" value={tgToken} onChange={e => setTgToken(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" required />
+              <div className="flex gap-2">
+                <button type="submit" disabled={saving} className="bg-[#0088cc] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#0077b5] disabled:opacity-50">{saving ? 'Bağlanıyor...' : 'Bağla'}</button>
+                <button type="button" onClick={() => setShowTgForm(false)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">İptal</button>
               </div>
             </form>
           )}
         </div>
       </div>
 
-      {/* Telegram (yakında) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 opacity-60">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Bot className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
-            <div>
-              <h3 className="font-bold text-gray-900">Telegram Bot</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Telegram bot entegrasyonu</p>
+      {/* ===== INSTAGRAM ===== */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg flex items-center justify-center"><Smartphone className="w-4 h-4 text-pink-600" /></div>
+          <div><h3 className="font-bold text-gray-900">Instagram</h3><p className="text-xs text-gray-500">Instagram Messaging API</p></div>
+        </div>
+
+        {igChannels.map(c => (
+          <div key={c.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl mb-3">
+            <div><p className="text-sm font-medium text-gray-900">{c.display_name}</p><p className="text-xs text-gray-500">ID: {c.platform_id}</p></div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs px-2 py-1 rounded-full bg-pink-100 text-pink-700 font-medium">● Bağlı</span>
+              <button onClick={() => deleteChannel(c.id)} className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
-          <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-medium">Yakında</span>
+        ))}
+
+        <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-xl p-5">
+          {!showIgForm ? (
+            <div className="text-center">
+              <button onClick={() => setShowIgForm(true)} className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition inline-flex items-center gap-2">
+                📸 Instagram Bağla
+              </button>
+              <p className="text-xs text-gray-500 mt-2">Instagram Business hesabınızı bağlayın</p>
+            </div>
+          ) : (
+            <form onSubmit={handleInstagram} className="space-y-3">
+              <div className="bg-white border border-pink-100 rounded-lg p-3 text-xs text-pink-700">
+                <p className="font-medium mb-1">Instagram API bilgileri</p>
+                <p>Meta Business Suite → Instagram → API Setup'tan Page ID ve Access Token alın. Instagram hesabınız bir Facebook sayfasına bağlı olmalıdır.</p>
+              </div>
+              <input type="text" placeholder="Instagram Page ID *" value={igForm.page_id} onChange={e => setIgForm({ ...igForm, page_id: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
+              <input type="password" placeholder="Access Token *" value={igForm.access_token} onChange={e => setIgForm({ ...igForm, access_token: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
+              <div className="flex gap-2">
+                <button type="submit" disabled={saving} className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50">{saving ? 'Bağlanıyor...' : 'Bağla'}</button>
+                <button type="button" onClick={() => setShowIgForm(false)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">İptal</button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

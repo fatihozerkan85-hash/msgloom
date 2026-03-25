@@ -14,7 +14,7 @@ export default function Automations() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ type: 'keyword', trigger_text: '', response_text: '' });
+  const [form, setForm] = useState({ type: 'keyword', trigger_text: '', response_text: '', platform: 'all' });
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null);
 
@@ -83,12 +83,12 @@ export default function Automations() {
 
   const startEdit = (a) => {
     setEditId(a.id);
-    setForm({ type: a.type, trigger_text: a.trigger_text || '', response_text: a.response_text });
+    setForm({ type: a.type, trigger_text: a.trigger_text || '', response_text: a.response_text, platform: a.platform || 'all' });
     setShowAdd(true);
   };
 
   const resetForm = () => {
-    setForm({ type: 'keyword', trigger_text: '', response_text: '' });
+    setForm({ type: 'keyword', trigger_text: '', response_text: '', platform: 'all' });
     setEditId(null);
     setShowAdd(false);
   };
@@ -124,10 +124,11 @@ export default function Automations() {
           <div>
             <h4 className="font-bold text-blue-900 text-sm mb-2">Nasıl Çalışır?</h4>
             <div className="text-xs text-blue-700 space-y-1">
-              <p>1. Müşteri WhatsApp'tan mesaj yazar</p>
+              <p>1. Müşteri WhatsApp, Telegram veya Instagram'dan mesaj yazar</p>
               <p>2. İlk kez yazıyorsa → <span className="font-semibold">Karşılama Mesajı</span> gider</p>
               <p>3. Mesajda anahtar kelime varsa → <span className="font-semibold">Eşleşen yanıt</span> gider</p>
               <p>4. Hiçbir kural eşleşmezse → <span className="font-semibold">Varsayılan Yanıt</span> gider</p>
+              <p>5. Kuralları tüm kanallara veya belirli bir platforma özel tanımlayabilirsiniz</p>
             </div>
           </div>
         </div>
@@ -155,6 +156,18 @@ export default function Automations() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
+              <div className="flex gap-2">
+                {[{ k: 'all', l: '🌐 Tümü' }, { k: 'whatsapp', l: '🟢 WhatsApp' }, { k: 'telegram', l: '🔵 Telegram' }, { k: 'instagram', l: '📸 Instagram' }].map(p => (
+                  <button key={p.k} type="button" onClick={() => setForm({ ...form, platform: p.k })}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium border-2 transition ${form.platform === p.k ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                    {p.l}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -219,6 +232,9 @@ export default function Automations() {
                         }`}>{cfg.label}</span>
                         {a.type === 'keyword' && a.trigger_text && (
                           <span className="text-xs text-gray-500">Kelimeler: <span className="font-medium text-gray-700">{a.trigger_text}</span></span>
+                        )}
+                        {a.platform && a.platform !== 'all' && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{a.platform === 'whatsapp' ? '🟢' : a.platform === 'telegram' ? '🔵' : '📸'} {a.platform}</span>
                         )}
                       </div>
                       <p className="text-sm text-gray-700 whitespace-pre-line">{a.response_text}</p>

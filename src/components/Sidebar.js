@@ -1,14 +1,14 @@
 'use client';
 
-import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut, FileText, Zap } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Send, Users, Settings, LogOut, FileText, Zap, Megaphone } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { id: 'messages', label: 'Mesajlar', Icon: MessageSquare },
   { id: 'send', label: 'Mesaj Gönder', Icon: Send },
+  { id: 'broadcast', label: 'Toplu Mesaj', Icon: Megaphone },
   { id: 'contacts', label: 'Kişiler', Icon: Users },
   { id: 'automations', label: 'Otomasyonlar', Icon: Zap },
-  { id: 'content', label: 'İçerik Yönetimi', Icon: FileText },
   { id: 'settings', label: 'Ayarlar', Icon: Settings },
 ];
 
