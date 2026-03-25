@@ -21,8 +21,12 @@ export async function POST(request) {
       return Response.json({ error: 'Email veya şifre hatalı' }, { status: 401 });
     }
 
+    if (!user.email_verified) {
+      return Response.json({ error: 'E-posta adresiniz doğrulanmamış', needsVerification: true, email: user.email }, { status: 403 });
+    }
+
     const token = createToken(user);
-    const { password_hash, ...safeUser } = user;
+    const { password_hash, verification_code, verification_expires, ...safeUser } = user;
 
     return Response.json({ success: true, user: safeUser }, {
       headers: { 'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}` }

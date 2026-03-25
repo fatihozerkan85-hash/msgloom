@@ -20,8 +20,13 @@ export default function RegisterPage() {
       body: JSON.stringify(form),
     });
     const data = await res.json();
-    if (data.success) router.push('/dashboard');
-    else setError(data.error);
+    if (data.success && data.needsVerification) {
+      router.push(`/verify?email=${encodeURIComponent(form.email)}`);
+    } else if (data.success) {
+      router.push('/dashboard');
+    } else {
+      setError(data.error);
+    }
     setLoading(false);
   };
 

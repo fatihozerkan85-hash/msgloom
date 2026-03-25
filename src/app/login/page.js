@@ -22,6 +22,7 @@ export default function LoginPage() {
     });
     const data = await res.json();
     if (data.success) router.push('/dashboard');
+    else if (data.needsVerification) router.push(`/verify?email=${encodeURIComponent(data.email)}`);
     else setError(data.error);
     setLoading(false);
   };
