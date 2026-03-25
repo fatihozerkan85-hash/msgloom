@@ -38,7 +38,8 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link1')}</a>
               <a href="#how-it-works" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link4')}</a>
-              <a href="#benefits" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link2')}</a>
+              <Link href="/crm-features" className="text-gray-700 hover:text-blue-600">CRM</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-blue-600">Fiyatlandırma</Link>
               <a href="#contact" className="text-gray-700 hover:text-blue-600">{t(c,'navbar','link3')}</a>
               <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium">{t(c,'navbar','login')}</Link>
               <Link href="/register" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
