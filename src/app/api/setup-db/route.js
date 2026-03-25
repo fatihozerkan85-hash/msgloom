@@ -29,22 +29,24 @@ export async function POST(request) {
 
     await sql`CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      channel_id INTEGER REFERENCES channels(id) ON DELETE SET NULL,
+      channel_id INTEGER,
       platform VARCHAR(20) DEFAULT 'whatsapp', direction VARCHAR(10) NOT NULL,
-      contact_id VARCHAR(100) NOT NULL, contact_name VARCHAR(255),
+      contact_id VARCHAR(100), contact_name VARCHAR(255),
       type VARCHAR(20) DEFAULT 'text', text_body TEXT, media_url TEXT,
+      phone VARCHAR(20), template_name VARCHAR(100), wa_message_id VARCHAR(100),
       platform_message_id VARCHAR(255), raw_data JSONB,
       created_at TIMESTAMP DEFAULT NOW()
     )`;
 
     await sql`CREATE TABLE IF NOT EXISTS contacts (
       id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      platform VARCHAR(20) NOT NULL, platform_contact_id VARCHAR(100) NOT NULL,
+      platform VARCHAR(20) NOT NULL DEFAULT 'whatsapp', platform_contact_id VARCHAR(100) NOT NULL,
       name VARCHAR(255), phone VARCHAR(50), tags TEXT[] DEFAULT '{}',
       last_message_at TIMESTAMP, message_count INTEGER DEFAULT 0,
-      extra JSONB DEFAULT '{}', created_at TIMESTAMP DEFAULT NOW(),
-      UNIQUE(user_id, platform, platform_contact_id)
+      extra JSONB DEFAULT '{}', created_at TIMESTAMP DEFAULT NOW()
     )`;
+    // Unique constraint ekle (yoksa)
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_contacts_unique ON contacts(user_id, platform, platform_contact_id)`;
 
     await sql`CREATE TABLE IF NOT EXISTS automations (
       id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -83,6 +85,21 @@ export async function POST(request) {
     await sql`ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_url TEXT`;
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP`;
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
+
+    // Contacts tablosu eksik kolonlar
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS platform VARCHAR(20) DEFAULT 'whatsapp'`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS platform_contact_id VARCHAR(100)`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}'`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS last_message_at TIMESTAMP`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS message_count INTEGER DEFAULT 0`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS extra JSONB DEFAULT '{}'`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS email VARCHAR(255)`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS company VARCHAR(255)`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS notes TEXT`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS pipeline_stage VARCHAR(30) DEFAULT 'new'`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS deal_value DECIMAL(12,2) DEFAULT 0`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS source VARCHAR(50)`;
+    await sql`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS assigned_to VARCHAR(255)`;
 
     return Response.json({ success: true, message: 'Tüm tablolar hazır' });
   } catch (error) {
