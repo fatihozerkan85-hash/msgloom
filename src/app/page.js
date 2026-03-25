@@ -403,10 +403,10 @@ export default function Home() {
             <div>
               <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col1_title')}</h4>
               <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link1')}</a></li>
+                <li><Link href="/about" className="hover:text-white">{t(c,'footer','col1_link1')}</Link></li>
                 <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link2')}</a></li>
                 <li><a href="#features" className="hover:text-white">{t(c,'footer','col1_link3')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link4')}</a></li>
+                <li><Link href="/faq" className="hover:text-white">{t(c,'footer','col1_link4')}</Link></li>
               </ul>
             </div>
             <div>
@@ -414,6 +414,7 @@ export default function Home() {
               <ul className="space-y-3 text-gray-400">
                 <li><Link href="/terms" className="hover:text-white">{t(c,'footer','col2_link1')}</Link></li>
                 <li><Link href="/payment" className="hover:text-white">{t(c,'footer','col2_link2')}</Link></li>
+                <li><Link href="/usage-terms" className="hover:text-white">{t(c,'footer','col2_link7')}</Link></li>
                 <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link3')}</Link></li>
                 <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link4')}</Link></li>
                 <li><Link href="/cookies" className="hover:text-white">{t(c,'footer','col2_link5')}</Link></li>
