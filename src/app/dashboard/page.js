@@ -9,6 +9,7 @@ import SendMessage from '@/components/SendMessage';
 import Contacts from '@/components/Contacts';
 import Settings from '@/components/Settings';
 import ContentManager from '@/components/ContentManager';
+import Automations from '@/components/Automations';
 
 export default function DashboardPage() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -39,6 +40,7 @@ export default function DashboardPage() {
       case 'messages': return <Messages />;
       case 'send': return <SendMessage />;
       case 'contacts': return <Contacts />;
+      case 'automations': return <Automations />;
       case 'content': return <ContentManager />;
       case 'settings': return <Settings user={user} />;
       default: return <Dashboard />;
