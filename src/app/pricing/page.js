@@ -42,11 +42,18 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutHtml, setCheckoutHtml] = useState('');
+  const [statusMsg, setStatusMsg] = useState(null);
   const checkoutRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setUser(d.user); setChecking(false); }).catch(() => setChecking(false));
+    // URL'den ödeme durumunu kontrol et
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get('status');
+    if (s === 'failed') setStatusMsg({ type: 'error', text: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.' });
+    if (s === 'error') setStatusMsg({ type: 'error', text: 'Bir hata oluştu. Lütfen tekrar deneyin.' });
+    if (s) window.history.replaceState({}, '', '/pricing');
   }, []);
 
   useEffect(() => {
