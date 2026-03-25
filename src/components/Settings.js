@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MessageSquare, Smartphone, Plus, Bot } from 'lucide-react';
+import { MessageSquare, Smartphone, Plus, Bot, Trash2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function Settings({ user }) {
   const [accounts, setAccounts] = useState([]);
   const [form, setForm] = useState({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
   const [status, setStatus] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     fetch('/api/account/whatsapp')
@@ -19,20 +20,42 @@ export default function Settings({ user }) {
   const handleAdd = async (e) => {
     e.preventDefault();
     setStatus(null);
-    const res = await fetch('/api/account/whatsapp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setAccounts([...accounts, data.account]);
-      setForm({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
-      setShowForm(false);
-      setStatus({ type: 'success', text: 'WhatsApp hesabı başarıyla eklendi' });
-    } else {
-      setStatus({ type: 'error', text: data.error });
+    setAdding(true);
+    try {
+      const res = await fetch('/api/account/whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAccounts([data.account, ...accounts]);
+        setForm({ phone_number_id: '', business_account_id: '', access_token: '', phone_number: '' });
+        setShowForm(false);
+        setStatus({ type: 'success', text: `WhatsApp hesabı eklendi${data.account.display_name ? ': ' + data.account.display_name : ''}` });
+      } else {
+        setStatus({ type: 'error', text: data.error });
+      }
+    } catch {
+      setStatus({ type: 'error', text: 'Bağlantı hatası' });
     }
+    setAdding(false);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Bu WhatsApp hesabını silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch('/api/account/whatsapp', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAccounts(accounts.filter(a => a.id !== id));
+        setStatus({ type: 'success', text: 'Hesap silindi' });
+      }
+    } catch {}
   };
 
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
@@ -45,7 +68,8 @@ export default function Settings({ user }) {
       </div>
 
       {status && (
-        <div className={`mb-6 p-4 rounded-xl text-sm ${status.type === 'success' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+        <div className={`mb-6 p-4 rounded-xl text-sm flex items-center gap-2 ${status.type === 'success' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
+          {status.type === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <XCircle className="w-4 h-4 flex-shrink-0" />}
           {status.text}
         </div>
       )}
@@ -95,13 +119,18 @@ export default function Settings({ user }) {
                     <MessageSquare className="w-4 h-4" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{acc.phone_number || acc.phone_number_id}</p>
+                    <p className="text-sm font-medium text-gray-900">{acc.display_name || acc.phone_number || acc.phone_number_id}</p>
                     <p className="text-xs text-gray-500">ID: {acc.phone_number_id}</p>
                   </div>
                 </div>
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
-                  {acc.is_active ? 'Aktif' : 'Pasif'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${acc.is_active ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
+                    {acc.is_active ? 'Aktif' : 'Pasif'}
+                  </span>
+                  <button onClick={() => handleDelete(acc.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Hesabı sil">
+                    <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -109,23 +138,42 @@ export default function Settings({ user }) {
           <div className="bg-gray-50 rounded-xl p-8 text-center mb-4">
             <Smartphone className="w-10 h-10 text-gray-300 mx-auto mb-2" strokeWidth={1.5} />
             <p className="text-gray-500 text-sm">Henüz WhatsApp hesabı eklenmemiş</p>
+            <p className="text-gray-400 text-xs mt-1">Meta Business Suite'den API bilgilerinizi alarak hesabınızı bağlayın</p>
           </div>
         )}
 
         {showForm && (
           <form onSubmit={handleAdd} className="border-t border-gray-100 pt-4 space-y-3">
-            <div className="grid md:grid-cols-2 gap-3">
-              <input type="text" placeholder="Phone Number ID *" value={form.phone_number_id} onChange={update('phone_number_id')}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
-              <input type="text" placeholder="Business Account ID" value={form.business_account_id} onChange={update('business_account_id')}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-700">
+              <p className="font-medium mb-1">WhatsApp Business API bilgilerinizi nereden bulabilirsiniz?</p>
+              <p>Meta Business Suite → WhatsApp → API Setup sayfasından Phone Number ID ve Access Token bilgilerinizi alabilirsiniz.</p>
             </div>
-            <input type="text" placeholder="Access Token *" value={form.access_token} onChange={update('access_token')}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
-            <input type="text" placeholder="Telefon Numarası (opsiyonel)" value={form.phone_number} onChange={update('phone_number')}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
+            <div className="grid md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Phone Number ID *</label>
+                <input type="text" placeholder="123456789012345" value={form.phone_number_id} onChange={update('phone_number_id')}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Business Account ID</label>
+                <input type="text" placeholder="Opsiyonel" value={form.business_account_id} onChange={update('business_account_id')}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Access Token *</label>
+              <input type="password" placeholder="EAAxxxxxxx..." value={form.access_token} onChange={update('access_token')}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" required />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Telefon Numarası</label>
+              <input type="text" placeholder="905xxxxxxxxx (opsiyonel)" value={form.phone_number} onChange={update('phone_number')}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none" />
+            </div>
             <div className="flex gap-3">
-              <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition">Kaydet</button>
+              <button type="submit" disabled={adding} className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition">
+                {adding ? 'Doğrulanıyor...' : 'Bağla ve Kaydet'}
+              </button>
               <button type="button" onClick={() => setShowForm(false)} className="text-gray-500 px-6 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition">İptal</button>
             </div>
           </form>

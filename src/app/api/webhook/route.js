@@ -17,17 +17,34 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    if (body.object === 'whatsapp_business_account') {
-      const sql = neon(process.env.POSTGRES_URL);
+    if (body.object !== 'whatsapp_business_account') {
+      return Response.json({ status: 'ignored' });
+    }
 
-      for (const entry of body.entry) {
-        for (const change of entry.changes) {
-          if (change.field === 'messages' && change.value.messages) {
-            for (const message of change.value.messages) {
-              await sql`INSERT INTO messages (direction, phone, type, text_body, wa_message_id, raw_data)
-                VALUES ('incoming', ${message.from}, ${message.type}, ${message.text?.body || null}, ${message.id}, ${JSON.stringify(message)})`;
-            }
-          }
+    const sql = neon(process.env.POSTGRES_URL);
+
+    for (const entry of body.entry) {
+      for (const change of entry.changes) {
+        if (change.field !== 'messages' || !change.value?.messages) continue;
+
+        // Gelen mesajın hangi phone_number_id'ye geldiğini bul
+        const phoneNumberId = change.value.metadata?.phone_number_id;
+        if (!phoneNumberId) continue;
+
+        // Bu phone_number_id hangi kullanıcıya ait?
+        const [account] = await sql`
+          SELECT user_id FROM whatsapp_accounts 
+          WHERE phone_number_id = ${phoneNumberId} AND is_active = true 
+          LIMIT 1
+        `;
+
+        const userId = account?.user_id || null;
+
+        for (const message of change.value.messages) {
+          await sql`
+            INSERT INTO messages (user_id, direction, phone, type, text_body, wa_message_id, raw_data)
+            VALUES (${userId}, 'incoming', ${message.from}, ${message.type}, ${message.text?.body || null}, ${message.id}, ${JSON.stringify(message)})
+          `;
         }
       }
     }
