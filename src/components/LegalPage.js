@@ -11,13 +11,17 @@ function ClauseBlock({ number }) {
   );
 }
 
-function Section({ title, clauseCount = 60 }) {
+function Section({ title, clauseCount = 60, content }) {
   return (
     <div className="mb-12">
       <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">{title}</h2>
-      {Array.from({ length: clauseCount }, (_, i) => (
-        <ClauseBlock key={i} number={i + 1} />
-      ))}
+      {content ? (
+        <div className="text-gray-700 leading-relaxed space-y-4 whitespace-pre-line">{content}</div>
+      ) : (
+        Array.from({ length: clauseCount }, (_, i) => (
+          <ClauseBlock key={i} number={i + 1} />
+        ))
+      )}
     </div>
   );
 }
@@ -47,7 +51,7 @@ export default function LegalPage({ title, sections }) {
         </div>
 
         {sections.map((s, i) => (
-          <Section key={i} title={s.title} clauseCount={s.clauseCount || 60} />
+          <Section key={i} title={s.title} clauseCount={s.clauseCount || 60} content={s.content} />
         ))}
       </main>
 

@@ -399,40 +399,38 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="border-t border-gray-700 pt-10 grid md:grid-cols-3 gap-10">
             <div>
-              <div className="flex items-center mb-4">
-                <MessageSquare className="w-6 h-6 text-blue-400" />
-                <span className="ml-2 text-lg font-semibold">MsgLoom</span>
-              </div>
-              <p className="text-gray-400">{t(c,'footer','desc')}</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">{t(c,'footer','col1_title')}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white">{t(c,'footer','col1_link1')}</a></li>
+              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col1_title')}</h4>
+              <ul className="space-y-3 text-gray-400">
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link1')}</a></li>
                 <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link2')}</a></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link3')}</a></li>
+                <li><a href="#features" className="hover:text-white">{t(c,'footer','col1_link3')}</a></li>
+                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link4')}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t(c,'footer','col2_title')}</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col2_title')}</h4>
+              <ul className="space-y-3 text-gray-400">
                 <li><Link href="/terms" className="hover:text-white">{t(c,'footer','col2_link1')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link2')}</Link></li>
-                <li><Link href="/payment" className="hover:text-white">{t(c,'footer','col2_link3')}</Link></li>
+                <li><Link href="/payment" className="hover:text-white">{t(c,'footer','col2_link2')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link3')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link4')}</Link></li>
+                <li><Link href="/cookies" className="hover:text-white">{t(c,'footer','col2_link5')}</Link></li>
+                <li><Link href="/security" className="hover:text-white">{t(c,'footer','col2_link6')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">{t(c,'footer','col3_title')}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/sla" className="hover:text-white">{t(c,'footer','col3_link1')}</Link></li>
-                <li><a href="#contact" className="hover:text-white">{t(c,'footer','col3_link2')}</a></li>
-                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col3_link3')}</Link></li>
+              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col3_title')}</h4>
+              <ul className="space-y-3 text-gray-400">
+                <li>{t(c,'footer','col3_line1')}</li>
+                <li>{t(c,'footer','col3_line2')}</li>
+                <li>{t(c,'footer','col3_line3')}</li>
               </ul>
+              <p className="mt-6 text-sm font-semibold text-gray-300">{t(c,'footer','col3_payments')}</p>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-gray-800 mt-10 pt-8 text-center text-gray-400 text-sm">
             <p>{t(c,'footer','copyright')}</p>
           </div>
         </div>
