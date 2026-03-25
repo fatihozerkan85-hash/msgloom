@@ -10,6 +10,7 @@ import Contacts from '@/components/Contacts';
 import Settings from '@/components/Settings';
 import Automations from '@/components/Automations';
 import Broadcast from '@/components/Broadcast';
+import CRM from '@/components/CRM';
 
 export default function DashboardPage() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -40,6 +41,7 @@ export default function DashboardPage() {
       case 'messages': return <Messages />;
       case 'send': return <SendMessage />;
       case 'contacts': return <Contacts />;
+      case 'crm': return <CRM />;
       case 'automations': return <Automations />;
       case 'broadcast': return <Broadcast />;
       case 'settings': return <Settings user={user} />;
