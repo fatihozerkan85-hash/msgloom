@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, TrendingUp, ArrowRight, Rocket, Clock, CheckCircle2, BadgeCheck } from 'lucide-react';
+import { MessageSquare, BarChart3, Zap, Shield, Users, Globe, TrendingUp, ArrowRight, Rocket, Clock, CheckCircle2, BadgeCheck, QrCode, CreditCard } from 'lucide-react';
 import { WhatsAppMockup } from '@/components/WhatsAppMockup';
 import { TelegramMockup } from '@/components/TelegramMockup';
 import { InstagramMockup } from '@/components/InstagramMockup';
@@ -399,40 +399,115 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-gray-700 pt-10 grid md:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-5 gap-8 mb-12">
+            {/* Company Info + Social Media */}
+            <div className="md:col-span-2">
+              <div className="flex items-center mb-4">
+                <MessageSquare className="w-6 h-6 text-blue-400" />
+                <span className="ml-2 text-lg font-semibold">MsgLoom</span>
+              </div>
+              <p className="text-gray-400 mb-6">{t(c,'footer','desc')}</p>
+
+              {/* Social Media */}
+              <div className="mb-6">
+                <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider">Bizi Takip Edin</h4>
+                <div className="flex gap-3 flex-wrap">
+                  {[
+                    { href: 'https://wa.me/message/YOURWHATSAPPNUMBER', svg: <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="white" />, svg2: <path d="M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.652c1.746.943 3.71 1.444 5.71 1.444h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.48-8.447zm-8.475 18.297c-1.774 0-3.513-.479-5.031-1.378l-.361-.214-3.741.98.998-3.648-.235-.374a9.86 9.86 0 01-1.511-5.26c.002-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.886-9.888 9.886z" fill="white" /> },
+                    { href: 'https://t.me/YOURTELEGRAMCHANNEL', svg: <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.921 9.055c-.145.658-.537.818-1.084.508l-3-2.211-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.575-4.457c.538-.196 1.006.128.834.943z" fill="white" /> },
+                    { href: 'https://instagram.com/YOURINSTAGRAM', svg: <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="white" /> },
+                    { href: 'https://linkedin.com/company/YOURCOMPANY', svg: <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="white" /> },
+                    { href: 'https://x.com/YOURHANDLE', svg: <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="white" /> },
+                  ].map((s, i) => (
+                    <motion.a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center group"
+                      whileHover={{ scale: 1.15, backgroundColor: 'rgba(255,255,255,0.1)' }} whileTap={{ scale: 0.95 }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="group-hover:scale-110 transition-transform">{s.svg}{s.svg2}</svg>
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+
+              {/* QR Code */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white p-3 rounded-lg"><QrCode className="w-16 h-16 text-gray-900" /></div>
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Hızlı Erişim</h4>
+                    <p className="text-xs text-gray-400">QR kodu okutarak hemen başlayın</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Ürün */}
             <div>
-              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col1_title')}</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li><Link href="/about" className="hover:text-white">{t(c,'footer','col1_link1')}</Link></li>
-                <li><a href="#" className="hover:text-white">{t(c,'footer','col1_link2')}</a></li>
-                <li><a href="#features" className="hover:text-white">{t(c,'footer','col1_link3')}</a></li>
-                <li><Link href="/faq" className="hover:text-white">{t(c,'footer','col1_link4')}</Link></li>
+              <h4 className="font-semibold mb-4">Ürün</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#features" className="hover:text-white transition-colors">{t(c,'footer','col1_link3')}</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">Nasıl Çalışır</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Fiyatlandırma</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
               </ul>
             </div>
+
+            {/* Şirket */}
             <div>
-              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col2_title')}</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li><Link href="/terms" className="hover:text-white">{t(c,'footer','col2_link1')}</Link></li>
-                <li><Link href="/payment" className="hover:text-white">{t(c,'footer','col2_link2')}</Link></li>
-                <li><Link href="/usage-terms" className="hover:text-white">{t(c,'footer','col2_link7')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link3')}</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">{t(c,'footer','col2_link4')}</Link></li>
-                <li><Link href="/cookies" className="hover:text-white">{t(c,'footer','col2_link5')}</Link></li>
-                <li><Link href="/security" className="hover:text-white">{t(c,'footer','col2_link6')}</Link></li>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col1_title')}</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/about" className="hover:text-white transition-colors">{t(c,'footer','col1_link1')}</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t(c,'footer','col1_link2')}</a></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">İletişim</a></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">{t(c,'footer','col1_link4')}</Link></li>
               </ul>
             </div>
+
+            {/* Yasal */}
             <div>
-              <h4 className="font-bold text-sm tracking-wider mb-4">{t(c,'footer','col3_title')}</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>{t(c,'footer','col3_line1')}</li>
-                <li>{t(c,'footer','col3_line2')}</li>
-                <li>{t(c,'footer','col3_line3')}</li>
+              <h4 className="font-semibold mb-4">{t(c,'footer','col2_title')}</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/terms" className="hover:text-white transition-colors">{t(c,'footer','col2_link1')}</Link></li>
+                <li><Link href="/payment" className="hover:text-white transition-colors">{t(c,'footer','col2_link2')}</Link></li>
+                <li><Link href="/usage-terms" className="hover:text-white transition-colors">{t(c,'footer','col2_link7')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">{t(c,'footer','col2_link3')}</Link></li>
+                <li><Link href="/cookies" className="hover:text-white transition-colors">{t(c,'footer','col2_link5')}</Link></li>
+                <li><Link href="/security" className="hover:text-white transition-colors">{t(c,'footer','col2_link6')}</Link></li>
               </ul>
-              <p className="mt-6 text-sm font-semibold text-gray-300">{t(c,'footer','col3_payments')}</p>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-10 pt-8 text-center text-gray-400 text-sm">
-            <p>{t(c,'footer','copyright')}</p>
+
+          {/* Ödeme Yöntemleri */}
+          <div className="border-t border-gray-800 pt-8 pb-8">
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex items-center gap-3">
+                <CreditCard className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-400 font-semibold">Güvenli Ödeme Yöntemleri</span>
+              </div>
+              <div className="flex items-center gap-4 flex-wrap justify-center">
+                <motion.div className="w-20 h-16 rounded-lg flex items-center justify-center group" whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                  <span className="text-xl font-black tracking-tight text-white">iyzico</span>
+                </motion.div>
+                <motion.div className="w-16 h-16 rounded-lg flex items-center justify-center group" whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                  <div className="flex items-center -space-x-2"><div className="w-7 h-7 rounded-full border-2 border-white"></div><div className="w-7 h-7 rounded-full border-2 border-white"></div></div>
+                </motion.div>
+                <motion.div className="w-16 h-16 rounded-lg flex items-center justify-center group" whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                  <span className="text-2xl font-black italic text-white" style={{ letterSpacing: '-0.05em' }}>VISA</span>
+                </motion.div>
+                <motion.div className="w-16 h-16 rounded-lg flex items-center justify-center group" whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                  <span className="text-xl font-black text-white" style={{ letterSpacing: '0.05em' }}>TROY</span>
+                </motion.div>
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-2">256-bit SSL şifreleme ile güvenli ödeme</p>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <p className="text-gray-400 text-sm">
+              {t(c,'footer','copyright')} •
+              <Link href="/privacy" className="hover:text-white ml-1">Gizlilik Politikası</Link> •
+              <Link href="/usage-terms" className="hover:text-white ml-1">Kullanım Koşulları</Link>
+            </p>
           </div>
         </div>
       </footer>
