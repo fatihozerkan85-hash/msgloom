@@ -20,6 +20,8 @@ export default function Settings({ user }) {
   const [saving, setSaving] = useState(false);
   const [showTgGuide, setShowTgGuide] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
+  const [connectingIg, setConnectingIg] = useState(false);
+  const [showIgManual, setShowIgManual] = useState(false);
 
   useEffect(() => {
     fetch('/api/account/whatsapp').then(r => r.json()).then(d => setWaAccounts(d.accounts || [])).catch(() => {});
@@ -98,6 +100,45 @@ export default function Settings({ user }) {
     else setStatus({ type: 'error', text: d.error });
     setSaving(false);
   };
+
+  const handleInstagramOAuth = useCallback(() => {
+    if (!window.FB) { setStatus({ type: 'error', text: 'Facebook SDK yüklenemedi. Sayfayı yenileyin.' }); return; }
+    setConnectingIg(true); setStatus(null);
+    window.FB.login(function (response) {
+      if (response.authResponse?.accessToken) {
+        // Token'ı backend'e gönder — sayfa ve IG hesap bilgilerini otomatik alacak
+        fetch('/api/account/instagram/exchange-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: response.authResponse.accessToken })
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d.success && d.channels?.length > 0) {
+              setChannels(prev => {
+                const newChannels = [...prev];
+                for (const ch of d.channels) {
+                  const idx = newChannels.findIndex(c => c.id === ch.id);
+                  if (idx >= 0) newChannels[idx] = ch;
+                  else newChannels.unshift(ch);
+                }
+                return newChannels;
+              });
+              setStatus({ type: 'success', text: `Instagram bağlandı: ${d.channels.map(c => c.display_name).join(', ')}` });
+            } else {
+              setStatus({ type: 'error', text: d.error || 'Instagram hesabı bulunamadı' });
+            }
+          })
+          .catch(() => setStatus({ type: 'error', text: 'Bağlantı hatası' }));
+      } else {
+        setStatus({ type: 'error', text: 'Facebook girişi iptal edildi' });
+      }
+      setConnectingIg(false);
+    }, {
+      scope: 'instagram_basic,instagram_manage_messages,pages_show_list,pages_messaging',
+      return_scopes: true
+    });
+  }, []);
 
   const deleteWa = async (id) => { if (!confirm('Silmek istediğinize emin misiniz?')) return; const r = await fetch('/api/account/whatsapp', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); if ((await r.json()).success) setWaAccounts(waAccounts.filter(a => a.id !== id)); };
   const deleteChannel = async (id) => { if (!confirm('Silmek istediğinize emin misiniz?')) return; const r = await fetch('/api/account/channels', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); if ((await r.json()).success) setChannels(channels.filter(c => c.id !== id)); };
@@ -371,30 +412,58 @@ export default function Settings({ user }) {
         ))}
 
         <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-xl p-5">
-          {!showIgForm ? (
-            <div className="text-center">
-              <button onClick={() => setShowIgForm(true)} className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition inline-flex items-center gap-2">
-                📸 Instagram Bağla
-              </button>
-              <p className="text-xs text-gray-500 mt-2">Instagram Business hesabınızı bağlayın</p>
+          <div className="text-center">
+            <button
+              onClick={handleInstagramOAuth}
+              disabled={connectingIg || !sdkReady}
+              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-pink-200 disabled:opacity-50 inline-flex items-center gap-2"
+            >
+              {connectingIg ? (
+                <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> Bağlanıyor...</>
+              ) : '📸 Instagram Bağla'}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">Facebook ile giriş yaparak Instagram Business hesabınızı bağlayın</p>
+            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <span className="flex items-center gap-1">✓ Tek tıkla bağlantı</span>
+              <span className="flex items-center gap-1">✓ Token gerekmez</span>
+              <span className="flex items-center gap-1">✓ Otomatik kurulum</span>
             </div>
-          ) : (
-            <form onSubmit={handleInstagram} className="space-y-3">
-              <div className="bg-white border border-pink-100 rounded-lg p-3 text-xs text-pink-700">
-                <p className="font-medium mb-1">Instagram API bilgileri</p>
-                <p>Meta Business Suite → Instagram → API Setup'tan Page ID ve Access Token alın. Instagram hesabınız bir Facebook sayfasına bağlı olmalıdır.</p>
-              </div>
-              <input type="text" placeholder="Instagram Page ID *" value={igForm.page_id} onChange={e => setIgForm({ ...igForm, page_id: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
-              <input type="password" placeholder="Access Token *" value={igForm.access_token} onChange={e => setIgForm({ ...igForm, access_token: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
-              <div className="flex gap-2">
-                <button type="submit" disabled={saving} className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50">{saving ? 'Bağlanıyor...' : 'Bağla'}</button>
-                <button type="button" onClick={() => setShowIgForm(false)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">İptal</button>
-              </div>
-            </form>
-          )}
+          </div>
         </div>
+
+        {/* Gereksinimler bilgi kutusu */}
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="flex items-start gap-2">
+            <span className="text-base">💡</span>
+            <div className="text-xs text-amber-800 space-y-1">
+              <p className="font-semibold">Instagram bağlantısı için gerekenler:</p>
+              <p>• Instagram hesabınız <span className="font-semibold">Business</span> veya <span className="font-semibold">Creator</span> hesabı olmalı</p>
+              <p>• Instagram hesabınız bir <span className="font-semibold">Facebook Sayfası</span>na bağlı olmalı</p>
+              <p>• Facebook ile giriş yapıp ilgili sayfaya erişim izni vermeniz yeterli</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Manuel ekleme seçeneği */}
+        <button onClick={() => setShowIgManual(!showIgManual)} className="text-xs text-gray-400 hover:text-gray-600 mt-3 block">
+          {showIgManual ? 'Kapat' : 'Manuel ekle →'}
+        </button>
+        {showIgManual && (
+          <form onSubmit={handleInstagram} className="mt-2 border border-gray-200 rounded-xl p-4 space-y-2">
+            <div className="bg-white border border-pink-100 rounded-lg p-3 text-xs text-pink-700">
+              <p className="font-medium mb-1">Manuel bağlantı</p>
+              <p>Meta Business Suite → Instagram → API Setup&apos;tan Page ID ve Access Token alın.</p>
+            </div>
+            <input type="text" placeholder="Instagram Page ID *" value={igForm.page_id} onChange={e => setIgForm({ ...igForm, page_id: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
+            <input type="password" placeholder="Access Token *" value={igForm.access_token} onChange={e => setIgForm({ ...igForm, access_token: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-pink-500 focus:outline-none" required />
+            <div className="flex gap-2">
+              <button type="submit" disabled={saving} className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50">{saving ? 'Bağlanıyor...' : 'Bağla'}</button>
+              <button type="button" onClick={() => setShowIgManual(false)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">İptal</button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
