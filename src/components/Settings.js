@@ -55,13 +55,42 @@ export default function Settings({ user }) {
   }, []);
 
   const handleEmbeddedSignup = useCallback(() => {
-    if (!window.FB) { setStatus({ type: 'error', text: 'Facebook SDK yüklenemedi' }); return; }
+    if (!window.FB) { setStatus({ type: 'error', text: 'Facebook SDK yüklenemedi. Sayfayı yenileyin.' }); return; }
     setConnecting(true); setStatus(null);
     window.FB.login(function (r) {
-      if (r.authResponse?.code && window.__wa_signup_data) {
-        exchangeWaToken(r.authResponse.code, window.__wa_signup_data.waba_id, window.__wa_signup_data.phone_number_id);
-      } else { setStatus({ type: 'error', text: 'Bağlantı iptal edildi' }); setConnecting(false); }
-    }, { config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '', response_type: 'code', override_default_response_type: true, extras: { setup: {}, featureType: '', sessionInfoVersion: 2 } });
+      if (r.authResponse?.accessToken) {
+        fetch('/api/account/whatsapp/oauth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: r.authResponse.accessToken })
+        })
+          .then(res => res.json())
+          .then(d => {
+            if (d.success && d.accounts?.length > 0) {
+              setWaAccounts(prev => {
+                const newAccounts = [...prev];
+                for (const acc of d.accounts) {
+                  const idx = newAccounts.findIndex(a => a.id === acc.id);
+                  if (idx >= 0) newAccounts[idx] = acc;
+                  else newAccounts.unshift(acc);
+                }
+                return newAccounts;
+              });
+              setStatus({ type: 'success', text: `WhatsApp bağlandı: ${d.accounts.map(a => a.display_name || a.phone_number).join(', ')}` });
+            } else {
+              setStatus({ type: 'error', text: d.error || 'WhatsApp hesabı bulunamadı' });
+            }
+          })
+          .catch(() => setStatus({ type: 'error', text: 'Bağlantı hatası' }));
+      } else {
+        setStatus({ type: 'error', text: 'Facebook girişi iptal edildi' });
+      }
+      setConnecting(false);
+    }, {
+      scope: 'whatsapp_business_management,whatsapp_business_messaging',
+      return_scopes: true,
+      extras: { setup: { business: { name: 'MsgLoom' } }, featureType: '', sessionInfoVersion: 2 }
+    });
   }, []);
 
   const exchangeWaToken = async (code, wabaId, phoneNumberId) => {
@@ -187,12 +216,36 @@ export default function Settings({ user }) {
           </div>
         ))}
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
-          <button onClick={handleEmbeddedSignup} disabled={connecting || !sdkReady}
-            className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-green-200 disabled:opacity-50 inline-flex items-center gap-2">
-            {connecting ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> Bağlanıyor...</> : '🟢 WhatsApp Bağla'}
-          </button>
-          <p className="text-xs text-gray-500 mt-2">Facebook ile giriş yaparak bağlayın</p>
+        <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+          <div className="text-center">
+            <button
+              onClick={handleEmbeddedSignup}
+              disabled={connecting || !sdkReady}
+              className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-green-200 disabled:opacity-50 inline-flex items-center gap-2"
+            >
+              {connecting ? (
+                <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> Bağlanıyor...</>
+              ) : '🟢 WhatsApp Bağla'}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">Facebook ile giriş yaparak WhatsApp Business hesabınızı bağlayın</p>
+            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <span className="flex items-center gap-1">✓ Tek tıkla bağlantı</span>
+              <span className="flex items-center gap-1">✓ Token gerekmez</span>
+              <span className="flex items-center gap-1">✓ Otomatik kurulum</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Gereksinimler */}
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="flex items-start gap-2">
+            <span className="text-base">💡</span>
+            <div className="text-xs text-amber-800 space-y-1">
+              <p className="font-semibold">WhatsApp bağlantısı için gerekenler:</p>
+              <p>• WhatsApp Business hesabınız olmalı</p>
+              <p>• Facebook ile giriş yapıp WhatsApp Business hesabınıza erişim izni vermeniz yeterli</p>
+            </div>
+          </div>
         </div>
 
         <button onClick={() => setShowWaManual(!showWaManual)} className="text-xs text-gray-400 hover:text-gray-600 mt-3 block">{showWaManual ? 'Kapat' : 'Manuel ekle →'}</button>
