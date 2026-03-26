@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MessageSquare, Smartphone, Plus, Trash2, CheckCircle, XCircle, Wifi, Send as SendIcon } from 'lucide-react';
+import { MessageSquare, Smartphone, Trash2, CheckCircle, XCircle, Send as SendIcon, ChevronDown, ChevronUp, ExternalLink, Copy, Check } from 'lucide-react';
 
 const FB_APP_ID = '949647074467565';
 
@@ -18,6 +18,8 @@ export default function Settings({ user }) {
   const [igForm, setIgForm] = useState({ page_id: '', access_token: '' });
   const [waForm, setWaForm] = useState({ phone_number_id: '', access_token: '' });
   const [saving, setSaving] = useState(false);
+  const [showTgGuide, setShowTgGuide] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
 
   useEffect(() => {
     fetch('/api/account/whatsapp').then(r => r.json()).then(d => setWaAccounts(d.accounts || [])).catch(() => {});
@@ -185,21 +187,168 @@ export default function Settings({ user }) {
               <button onClick={() => setShowTgForm(true)} className="bg-[#0088cc] hover:bg-[#0077b5] text-white px-6 py-3 rounded-xl font-semibold transition inline-flex items-center gap-2">
                 🔵 Telegram Bot Bağla
               </button>
-              <p className="text-xs text-gray-500 mt-2">@BotFather'dan aldığınız bot token'ı girin</p>
+              <p className="text-xs text-gray-500 mt-2">2 dakikada botunuzu bağlayın — teknik bilgi gerekmez</p>
             </div>
           ) : (
-            <form onSubmit={handleTelegram} className="space-y-3">
-              <div className="bg-white border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
-                <p className="font-medium mb-1">Bot token nasıl alınır?</p>
-                <p>1. Telegram'da @BotFather'a gidin → 2. /newbot yazın → 3. Bot adı ve username belirleyin → 4. Verilen token'ı buraya yapıştırın</p>
-              </div>
-              <input type="text" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz" value={tgToken} onChange={e => setTgToken(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" required />
-              <div className="flex gap-2">
-                <button type="submit" disabled={saving} className="bg-[#0088cc] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#0077b5] disabled:opacity-50">{saving ? 'Bağlanıyor...' : 'Bağla'}</button>
-                <button type="button" onClick={() => setShowTgForm(false)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100">İptal</button>
-              </div>
-            </form>
+            <div className="space-y-4">
+              {/* Adım adım rehber */}
+              <button
+                type="button"
+                onClick={() => setShowTgGuide(!showTgGuide)}
+                className="w-full flex items-center justify-between bg-white border border-blue-200 rounded-xl p-4 hover:bg-blue-50 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📖</span>
+                  <div className="text-left">
+                    <p className="font-semibold text-blue-900 text-sm">Bot Token Nasıl Alınır?</p>
+                    <p className="text-xs text-blue-600">Adım adım görsel rehber — 2 dakikada tamamlayın</p>
+                  </div>
+                </div>
+                {showTgGuide ? <ChevronUp className="w-5 h-5 text-blue-500" /> : <ChevronDown className="w-5 h-5 text-blue-500" />}
+              </button>
+
+              {showTgGuide && (
+                <div className="bg-white border border-blue-100 rounded-xl overflow-hidden">
+                  {/* Adım 1 */}
+                  <div className="p-5 border-b border-blue-50">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 mb-2">Telegram&apos;da @BotFather&apos;ı açın</p>
+                        <p className="text-sm text-gray-600 mb-3">Telegram uygulamasında arama çubuğuna <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-blue-700">@BotFather</span> yazın ve açın.</p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">BF</div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">BotFather</p>
+                              <p className="text-xs text-gray-400">Telegram resmi bot yöneticisi</p>
+                            </div>
+                            <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">✓ Doğrulanmış</span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="bg-white rounded-lg p-2.5 text-xs text-gray-700 border border-gray-100 max-w-[80%]">
+                              I can help you create and manage Telegram bots. Choose what you want to do:
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {['/newbot', '/mybots', '/setname', '/setdescription'].map(cmd => (
+                                <span key={cmd} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200">{cmd}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 mt-3 text-xs text-blue-600 hover:text-blue-800 font-medium">
+                          <ExternalLink className="w-3.5 h-3.5" /> Doğrudan BotFather&apos;ı aç
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Adım 2 */}
+                  <div className="p-5 border-b border-blue-50">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 mb-2">/newbot komutunu gönderin</p>
+                        <p className="text-sm text-gray-600 mb-3">BotFather&apos;a <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-blue-700">/newbot</span> yazıp gönderin.</p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                          <div className="space-y-2">
+                            <div className="bg-blue-100 rounded-lg p-2.5 text-xs text-blue-800 max-w-[60%] ml-auto">/newbot</div>
+                            <div className="bg-white rounded-lg p-2.5 text-xs text-gray-700 border border-gray-100 max-w-[80%]">
+                              Alright, a new bot. How are we going to call it? Please choose a name for your bot.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Adım 3 */}
+                  <div className="p-5 border-b border-blue-50">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 mb-2">Bot adı ve username belirleyin</p>
+                        <p className="text-sm text-gray-600 mb-3">Önce botunuza bir isim verin (örn: &quot;Mağazam Bot&quot;), sonra bir username belirleyin. Username <span className="font-mono bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded">bot</span> ile bitmelidir.</p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                          <div className="space-y-2">
+                            <div className="bg-blue-100 rounded-lg p-2.5 text-xs text-blue-800 max-w-[60%] ml-auto">Mağazam Bot</div>
+                            <div className="bg-white rounded-lg p-2.5 text-xs text-gray-700 border border-gray-100 max-w-[80%]">
+                              Good. Now let&apos;s choose a username for your bot. It must end in &apos;bot&apos;.
+                            </div>
+                            <div className="bg-blue-100 rounded-lg p-2.5 text-xs text-blue-800 max-w-[60%] ml-auto">magazam_bot</div>
+                          </div>
+                        </div>
+                        <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+                          <span className="text-base">💡</span>
+                          <p className="text-xs text-amber-800">Username benzersiz olmalı ve <span className="font-semibold">bot</span> ile bitmelidir. Örnek: <span className="font-mono">sirketadi_bot</span>, <span className="font-mono">magazambot</span></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Adım 4 */}
+                  <div className="p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 mb-2">Token&apos;ı kopyalayın ve aşağıya yapıştırın</p>
+                        <p className="text-sm text-gray-600 mb-3">BotFather size bir token verecek. Bu token&apos;ı kopyalayıp aşağıdaki alana yapıştırın.</p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                          <div className="space-y-2">
+                            <div className="bg-white rounded-lg p-2.5 text-xs text-gray-700 border border-gray-100 max-w-[85%]">
+                              Done! Congratulations on your new bot. You will find it at <span className="text-blue-600">t.me/magazam_bot</span>.
+                              <br /><br />
+                              Use this token to access the HTTP API:
+                              <br />
+                              <span className="font-mono bg-green-50 text-green-800 px-1.5 py-0.5 rounded border border-green-200 inline-block mt-1">7123456789:AAHxxx...xxxyz</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-2">
+                          <span className="text-base">✅</span>
+                          <p className="text-xs text-green-800">Token&apos;ı kopyalayın ve aşağıdaki alana yapıştırın. Geri kalan her şeyi biz hallederiz — webhook ayarı, mesaj alma ve otomatik yanıtlar otomatik çalışır.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Token giriş formu */}
+              <form onSubmit={handleTelegram} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Bot Token</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="7123456789:AAHxxx...xxxyz"
+                      value={tgToken}
+                      onChange={e => setTgToken(e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono pr-10"
+                      required
+                    />
+                    {tgToken && (
+                      <button
+                        type="button"
+                        onClick={() => { navigator.clipboard.writeText(tgToken); setCopiedToken(true); setTimeout(() => setCopiedToken(false), 2000); }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition"
+                        title="Kopyala"
+                      >
+                        {copiedToken ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">BotFather&apos;dan aldığınız token&apos;ı yapıştırın</p>
+                </div>
+                <div className="flex gap-2">
+                  <button type="submit" disabled={saving} className="bg-[#0088cc] text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-[#0077b5] disabled:opacity-50 transition inline-flex items-center gap-2">
+                    {saving ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> Bağlanıyor...</> : '🔵 Botu Bağla'}
+                  </button>
+                  <button type="button" onClick={() => { setShowTgForm(false); setShowTgGuide(false); }} className="text-gray-500 px-4 py-2.5 rounded-xl text-sm hover:bg-gray-100 transition">İptal</button>
+                </div>
+              </form>
+            </div>
           )}
         </div>
       </div>
