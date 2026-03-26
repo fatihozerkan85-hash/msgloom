@@ -94,7 +94,7 @@ const defaults = [
 
 export async function POST(request) {
   const adminKey = request.headers.get('x-admin-key');
-  if (adminKey !== 'msgloom2026') return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+  if (adminKey !== process.env.ADMIN_PASSWORD) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
   try {
     const sql = neon(process.env.POSTGRES_URL);
     await sql`CREATE TABLE IF NOT EXISTS site_content (

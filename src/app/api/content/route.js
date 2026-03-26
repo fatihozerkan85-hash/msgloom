@@ -3,7 +3,7 @@ import { getUser } from '@/lib/auth';
 
 function isAdminHeader(request) {
   const authHeader = request.headers.get('x-admin-key');
-  return authHeader === 'msgloom2026';
+  return authHeader === process.env.ADMIN_PASSWORD;
 }
 
 export async function GET() {
