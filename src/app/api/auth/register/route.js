@@ -1,17 +1,34 @@
 import { neon } from '@neondatabase/serverless';
 import { hashPassword } from '@/lib/auth';
 import { generateCode, sendVerificationEmail } from '@/lib/email';
+import { rateLimit } from '@/lib/rateLimit';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rl = rateLimit(`register:${ip}`, { maxAttempts: 5, windowMs: 60 * 60 * 1000 });
+    if (!rl.allowed) {
+      return Response.json({ error: `Çok fazla kayıt denemesi. ${rl.retryAfter} saniye sonra tekrar deneyin.` }, { status: 429 });
+    }
+
     const { email, password, name, company } = await request.json();
 
     if (!email || !password) {
       return Response.json({ error: 'Email ve şifre gerekli' }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return Response.json({ error: 'Şifre en az 6 karakter olmalı' }, { status: 400 });
+    if (!EMAIL_REGEX.test(email) || email.length > 254) {
+      return Response.json({ error: 'Geçerli bir email adresi girin' }, { status: 400 });
+    }
+
+    if (password.length < 8) {
+      return Response.json({ error: 'Şifre en az 8 karakter olmalı' }, { status: 400 });
+    }
+
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      return Response.json({ error: 'Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermeli' }, { status: 400 });
     }
 
     const sql = neon(process.env.POSTGRES_URL);

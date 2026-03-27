@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { getAutoReply } from '@/lib/autoReply';
+import { verifyMetaWebhook } from '@/lib/webhookVerify';
 
 const IG_API = 'https://graph.facebook.com/v21.0';
 
@@ -19,7 +20,15 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+    const signature = request.headers.get('x-hub-signature-256');
+
+    if (!verifyMetaWebhook(rawBody, signature)) {
+      console.error('Instagram webhook imza doğrulaması başarısız');
+      return Response.json({ error: 'Geçersiz imza' }, { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody);
 
     if (body.object !== 'instagram') return Response.json({ ok: true });
 

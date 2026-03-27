@@ -93,7 +93,7 @@ export default function RegisterPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Şifre</label>
               <input type="password" value={form.password} onChange={update('password')}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition" placeholder="En az 6 karakter" required minLength={6} />
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition" placeholder="En az 8 karakter (büyük harf, küçük harf, rakam)" required minLength={8} />
             </div>
 
             {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl">{error}</div>}

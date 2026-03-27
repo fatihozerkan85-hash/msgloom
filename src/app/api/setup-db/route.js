@@ -1,10 +1,17 @@
 import { neon } from '@neondatabase/serverless';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rl = rateLimit(`setup-db:${ip}`, { maxAttempts: 3, windowMs: 60 * 60 * 1000 });
+    if (!rl.allowed) {
+      return Response.json({ error: 'Çok fazla deneme' }, { status: 429 });
+    }
+
     const body = await request.json().catch(() => ({}));
     const secret = body.secret;
-    const validSecret = process.env.SETUP_DB_SECRET || process.env.JWT_SECRET;
+    const validSecret = process.env.SETUP_DB_SECRET;
     if (!validSecret || !secret || secret !== validSecret) {
       return Response.json({ error: 'Yetkisiz' }, { status: 401 });
     }

@@ -1,12 +1,21 @@
 import { neon } from '@neondatabase/serverless';
 import { createToken } from '@/lib/auth';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
     const { email, code } = await request.json();
 
     if (!email || !code) {
       return Response.json({ error: 'Email ve doğrulama kodu gerekli' }, { status: 400 });
+    }
+
+    // Brute-force koruması — kod deneme limiti
+    const rlKey = `verify:${ip}:${email}`;
+    const rl = rateLimit(rlKey, { maxAttempts: 5, windowMs: 15 * 60 * 1000 });
+    if (!rl.allowed) {
+      return Response.json({ error: `Çok fazla deneme. ${rl.retryAfter} saniye sonra tekrar deneyin.` }, { status: 429 });
     }
 
     const sql = neon(process.env.POSTGRES_URL);
@@ -35,7 +44,7 @@ export async function POST(request) {
     const token = createToken({ id: user.id, email: user.email, plan: user.plan, is_admin: user.is_admin });
 
     return Response.json({ success: true, user: { id: user.id, email: user.email, name: user.name, company: user.company, plan: user.plan } }, {
-      headers: { 'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}` }
+      headers: { 'Set-Cookie': `token=${token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${7 * 24 * 60 * 60}` }
     });
   } catch (error) {
     console.error('Doğrulama hatası:', error);

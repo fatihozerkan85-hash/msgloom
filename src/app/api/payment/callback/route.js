@@ -43,11 +43,7 @@ export async function POST(request) {
 
           const sql = neon(process.env.POSTGRES_URL);
 
-          // Kullanıcının planını güncelle — 30 gün süre
-          const planExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-          await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
-          await sql`UPDATE users SET plan = ${planId}, plan_expires_at = ${planExpires} WHERE id = ${parseInt(userId)}`;
-
+          // İdempotency kontrolü — aynı ödeme tekrar işlenmesin
           await sql`CREATE TABLE IF NOT EXISTS payments (
             id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, plan VARCHAR(50),
             amount DECIMAL(12,2), currency VARCHAR(5) DEFAULT 'TRY',
@@ -55,8 +51,26 @@ export async function POST(request) {
             created_at TIMESTAMP DEFAULT NOW()
           )`;
 
+          const [existingPayment] = await sql`SELECT id FROM payments WHERE iyzico_payment_id = ${result.paymentId}`;
+          if (existingPayment) {
+            resolve(NextResponse.redirect(new URL(`/payment-result?status=success&plan=${planId}`, request.url)));
+            return;
+          }
+
+          // userId doğrulama
+          const parsedUserId = parseInt(userId);
+          if (isNaN(parsedUserId) || parsedUserId <= 0) {
+            resolve(NextResponse.redirect(new URL('/payment-result?status=error', request.url)));
+            return;
+          }
+
+          // Kullanıcının planını güncelle — 30 gün süre
+          const planExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+          await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMP`;
+          await sql`UPDATE users SET plan = ${planId}, plan_expires_at = ${planExpires} WHERE id = ${parsedUserId}`;
+
           await sql`INSERT INTO payments (user_id, plan, amount, iyzico_payment_id, status)
-            VALUES (${parseInt(userId)}, ${planId}, ${result.paidPrice}, ${result.paymentId}, 'success')`;
+            VALUES (${parsedUserId}, ${planId}, ${result.paidPrice}, ${result.paymentId}, 'success')`;
 
           resolve(NextResponse.redirect(new URL(`/payment-result?status=success&plan=${planId}&amount=${result.paidPrice}`, request.url)));
         } catch (dbErr) {

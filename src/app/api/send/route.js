@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { getUser } from '@/lib/auth';
 import axios from 'axios';
+import { rateLimit } from '@/lib/rateLimit';
 
 const WHATSAPP_API = 'https://graph.facebook.com/v21.0';
 
@@ -8,9 +9,19 @@ export async function POST(request) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
 
+  // Mesaj gönderme limiti — dakikada 30
+  const rl = rateLimit(`send:${user.id}`, { maxAttempts: 30, windowMs: 60 * 1000 });
+  if (!rl.allowed) {
+    return Response.json({ error: `Mesaj gönderme limiti aşıldı. ${rl.retryAfter} saniye sonra tekrar deneyin.` }, { status: 429 });
+  }
+
   try {
     const { to, message, type = 'text', template } = await request.json();
     if (!to) return Response.json({ error: 'Telefon numarası gerekli' }, { status: 400 });
+
+    if (message && message.length > 4096) {
+      return Response.json({ error: 'Mesaj çok uzun (max 4096 karakter)' }, { status: 400 });
+    }
 
     const sql = neon(process.env.POSTGRES_URL);
 

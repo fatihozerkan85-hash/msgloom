@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { getUser } from '@/lib/auth';
 import axios from 'axios';
+import { rateLimit } from '@/lib/rateLimit';
 
 const WA_API = 'https://graph.facebook.com/v21.0';
 const TG_API = 'https://api.telegram.org/bot';
@@ -25,9 +26,19 @@ export async function POST(request) {
   const user = await getUser(request);
   if (!user) return Response.json({ error: 'Yetkisiz' }, { status: 401 });
 
+  // Broadcast limiti — saatte 5
+  const rl = rateLimit(`broadcast:${user.id}`, { maxAttempts: 5, windowMs: 60 * 60 * 1000 });
+  if (!rl.allowed) {
+    return Response.json({ error: `Broadcast limiti aşıldı. ${rl.retryAfter} saniye sonra tekrar deneyin.` }, { status: 429 });
+  }
+
   try {
     const { platform, message, tags } = await request.json();
     if (!platform || !message) return Response.json({ error: 'Platform ve mesaj gerekli' }, { status: 400 });
+
+    if (message.length > 4096) {
+      return Response.json({ error: 'Mesaj çok uzun (max 4096 karakter)' }, { status: 400 });
+    }
 
     const sql = neon(process.env.POSTGRES_URL);
 

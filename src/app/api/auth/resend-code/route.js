@@ -1,12 +1,20 @@
 import { neon } from '@neondatabase/serverless';
 import { generateCode, sendVerificationEmail } from '@/lib/email';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
     const { email } = await request.json();
 
     if (!email) {
       return Response.json({ error: 'Email gerekli' }, { status: 400 });
+    }
+
+    // Spam koruması — kod gönderme limiti
+    const rl = rateLimit(`resend:${ip}:${email}`, { maxAttempts: 3, windowMs: 10 * 60 * 1000 });
+    if (!rl.allowed) {
+      return Response.json({ error: `Çok fazla istek. ${rl.retryAfter} saniye sonra tekrar deneyin.` }, { status: 429 });
     }
 
     const sql = neon(process.env.POSTGRES_URL);

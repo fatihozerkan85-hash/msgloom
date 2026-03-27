@@ -1,11 +1,17 @@
 import { neon } from '@neondatabase/serverless';
 import axios from 'axios';
 import { getAutoReply } from '@/lib/autoReply';
+import { verifyTelegramWebhook } from '@/lib/webhookVerify';
 
 const TG_API = 'https://api.telegram.org/bot';
 
 export async function POST(request) {
   try {
+    if (!verifyTelegramWebhook(request)) {
+      console.error('Telegram webhook secret doğrulaması başarısız');
+      return Response.json({ error: 'Yetkisiz' }, { status: 401 });
+    }
+
     const body = await request.json();
     const message = body.message || body.edited_message;
     if (!message) return Response.json({ ok: true });
