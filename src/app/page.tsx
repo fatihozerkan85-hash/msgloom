@@ -242,15 +242,15 @@ export default function Home() {
     }
 
     const analysis = analyzeFilename(nextFile.name);
-    setForm((current) => ({
-      ...current,
+    setForm({
       title: extractTitleFromFilename(nextFile.name),
-      category: resolveCategory(nextFile.name, current.category),
-      subcategory: current.subcategory || analysis.subcategory,
-      size: current.size || analysis.size,
-      season: current.season || analysis.season,
-      tags: current.tags || tagsToText(analysis.tags),
-    }));
+      category: resolveCategory(nextFile.name, ""),
+      subcategory: analysis.subcategory,
+      size: analysis.size,
+      season: analysis.season,
+      tags: tagsToText(analysis.tags),
+      notes: "",
+    });
   }
 
   function startEditing(pattern: PatternRecord) {

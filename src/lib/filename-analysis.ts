@@ -13,12 +13,12 @@ const categoryTerms: Record<string, string[]> = {
   Elbise: ["elbise", "abiye", "jile"],
   Etek: ["etek"],
   Pantolon: ["pantolon", "pantalon", "tayt"],
-  Şort: ["sort", "şort", "shorts"],
-  Gömlek: ["gomlek", "gömlek", "bluz", "tunik"],
-  Tişört: ["tisort", "tişört", "tshirt", "t-shirt", "t shirt"],
+  Şort: ["şort", "sort", "shorts"],
+  Gömlek: ["gömlek", "gomlek", "bluz", "tunik"],
+  Tişört: ["tişört", "tisort", "t-shirt", "tshirt", "t shirt"],
   Ceket: ["ceket", "blazer", "mont", "kaban"],
-  Çocuk: ["cocuk", "çocuk", "bebek"],
-  Aksesuar: ["yaka", "manset", "manşet", "cep", "kapuson", "kapüşon"],
+  Çocuk: ["çocuk", "cocuk", "bebek"],
+  Aksesuar: ["yaka", "manşet", "manset", "cep", "kapüşon", "kapuson"],
 };
 
 const subcategoryTerms: Record<string, string[]> = {
@@ -36,14 +36,23 @@ const subcategoryTerms: Record<string, string[]> = {
 
 const seasons: Record<string, string[]> = {
   Yaz: ["yaz", "summer"],
-  Kış: ["kis", "kış", "winter"],
+  Kış: ["kış", "kis", "winter"],
   İlkbahar: ["ilkbahar", "bahar", "spring"],
   Sonbahar: ["sonbahar", "autumn", "fall"],
 };
 
+const categoryMatchers = Object.entries(categoryTerms).flatMap(([category, terms]) =>
+  terms.map((term) => ({
+    category,
+    term,
+    normalizedTerm: normalizeText(term),
+  })),
+).sort((a, b) => b.normalizedTerm.length - a.normalizedTerm.length);
 
-function normalizeToken(value: string) {
+function normalizeText(value: string) {
   return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLocaleLowerCase("tr-TR")
     .replace(/ı/g, "i")
@@ -55,7 +64,7 @@ function normalizeToken(value: string) {
 }
 
 function tokenizeFilename(filename: string) {
-  const baseName = filename.replace(/\.[^/.]+$/, "");
+  const baseName = extractTitleFromFilename(filename);
   const rawTokens = baseName
     .split(/[\s_\-().,+#]+/)
     .map((token) => token.trim())
@@ -64,21 +73,50 @@ function tokenizeFilename(filename: string) {
   return {
     baseName,
     rawTokens,
-    tokens: rawTokens.map(normalizeToken),
+    tokens: rawTokens.map(normalizeText),
   };
 }
 
 function findByDictionary(tokens: string[], dictionary: Record<string, string[]>) {
   return (
     Object.entries(dictionary).find(([, terms]) =>
-      terms.some((term) => tokens.includes(normalizeToken(term))),
+      terms.some((term) => tokens.includes(normalizeText(term))),
     )?.[0] ?? ""
   );
 }
 
+function termAppearsInBasename(normalizedBase: string, normalizedTerm: string) {
+  if (!normalizedTerm) return false;
+  if (normalizedBase === normalizedTerm) return true;
+
+  const separatedPattern = new RegExp(
+    `(?:^|[\\s_\\-().,+#])${normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:$|[\\s_\\-().,+#])`,
+  );
+  if (separatedPattern.test(` ${normalizedBase} `)) return true;
+
+  if (!normalizedBase.endsWith(normalizedTerm)) return false;
+
+  const prefix = normalizedBase.slice(0, -normalizedTerm.length);
+  if (!prefix) return true;
+  if (/[\s_\-().,+#]$/.test(prefix)) return true;
+
+  return /^[a-z0-9]+$/i.test(prefix);
+}
+
 export function extractCategoryFromFilename(filename: string): string {
-  const { tokens } = tokenizeFilename(filename);
-  return findByDictionary(tokens, categoryTerms);
+  const { tokens, baseName } = tokenizeFilename(filename);
+  const normalizedBase = normalizeText(baseName);
+
+  const fromTokens = findByDictionary(tokens, categoryTerms);
+  if (fromTokens) return fromTokens;
+
+  for (const matcher of categoryMatchers) {
+    if (termAppearsInBasename(normalizedBase, matcher.normalizedTerm)) {
+      return matcher.category;
+    }
+  }
+
+  return "";
 }
 
 function isManualCategoryAllowed(value: string) {
@@ -104,7 +142,7 @@ export function extractTitleFromFilename(filename: string): string {
 }
 
 export function analyzeFilename(filename: string): FilenameAnalysis {
-  const { baseName, rawTokens, tokens } = tokenizeFilename(filename);
+  const { rawTokens, tokens } = tokenizeFilename(filename);
 
   const category = extractCategoryFromFilename(filename);
   const subcategory = findByDictionary(tokens, subcategoryTerms);
@@ -116,7 +154,7 @@ export function analyzeFilename(filename: string): FilenameAnalysis {
   const tags = [subcategory, season].filter(Boolean);
 
   return {
-    title: extractTitleFromFilename(filename) || baseName.trim(),
+    title: extractTitleFromFilename(filename),
     category,
     subcategory,
     size,
