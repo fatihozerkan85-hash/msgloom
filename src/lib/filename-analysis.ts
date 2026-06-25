@@ -99,6 +99,10 @@ export function resolveCategory(filename: string, manualCategory = "") {
   return DEFAULT_CATEGORY;
 }
 
+export function extractTitleFromFilename(filename: string): string {
+  return filename.replace(/\.[^/.]+$/, "").trim();
+}
+
 export function analyzeFilename(filename: string): FilenameAnalysis {
   const { baseName, rawTokens, tokens } = tokenizeFilename(filename);
 
@@ -112,7 +116,7 @@ export function analyzeFilename(filename: string): FilenameAnalysis {
   const tags = [subcategory, season].filter(Boolean);
 
   return {
-    title: baseName.replace(/[_-]+/g, " ").trim(),
+    title: extractTitleFromFilename(filename) || baseName.trim(),
     category,
     subcategory,
     size,
