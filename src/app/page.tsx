@@ -8,6 +8,7 @@ import {
   analyzeFilename,
   defaultCategories,
   defaultSeasons,
+  resolveCategory,
 } from "@/lib/filename-analysis";
 import { isSupabaseConfigured, storageBucket, supabase } from "@/lib/supabase";
 
@@ -243,7 +244,7 @@ export default function Home() {
     setForm((current) => ({
       ...current,
       title: current.title || analysis.title,
-      category: current.category || analysis.category,
+      category: resolveCategory(nextFile.name, current.category),
       subcategory: current.subcategory || analysis.subcategory,
       size: current.size || analysis.size,
       season: current.season || analysis.season,
@@ -305,7 +306,7 @@ export default function Home() {
       const payload = {
         user_id: session.user.id,
         title: form.title.trim(),
-        category: form.category.trim(),
+        category: resolveCategory(file?.name ?? "", form.category),
         subcategory: form.subcategory.trim(),
         size: form.size.trim(),
         season: form.season.trim(),

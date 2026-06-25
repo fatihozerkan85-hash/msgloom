@@ -7,14 +7,18 @@ export type FilenameAnalysis = {
   tags: string[];
 };
 
+export const DEFAULT_CATEGORY = "Diğer";
+
 const categoryTerms: Record<string, string[]> = {
   Elbise: ["elbise", "abiye", "jile"],
-  Etek: ["etek", "mini", "midi", "maksi"],
+  Etek: ["etek"],
   Pantolon: ["pantolon", "pantalon", "tayt"],
+  Şort: ["sort", "şort", "shorts"],
   Gömlek: ["gomlek", "gömlek", "bluz", "tunik"],
+  Tişört: ["tisort", "tişört", "tshirt", "t-shirt", "t shirt"],
   Ceket: ["ceket", "blazer", "mont", "kaban"],
-  Çocuk: ["cocuk", "çocuk", "bebek", "kiz", "kız", "erkek"],
-  Aksesuar: ["yaka", "kol", "manşet", "manset", "cep", "kapuson", "kapüşon"],
+  Çocuk: ["cocuk", "çocuk", "bebek"],
+  Aksesuar: ["yaka", "manset", "manşet", "cep", "kapuson", "kapüşon"],
 };
 
 const subcategoryTerms: Record<string, string[]> = {
@@ -25,6 +29,9 @@ const subcategoryTerms: Record<string, string[]> = {
   Pilili: ["pili", "pilili"],
   Fermuarlı: ["fermuar", "fermuarlı", "fermuarli"],
   Astarlı: ["astar", "astarlı", "astarli"],
+  Mini: ["mini"],
+  Midi: ["midi"],
+  Maksi: ["maksi"],
 };
 
 const seasons: Record<string, string[]> = {
@@ -34,7 +41,6 @@ const seasons: Record<string, string[]> = {
   Sonbahar: ["sonbahar", "autumn", "fall"],
 };
 
-const stopWords = new Set(["pdf", "kalip", "kalıp", "model", "patron"]);
 
 function normalizeToken(value: string) {
   return value
@@ -48,6 +54,20 @@ function normalizeToken(value: string) {
     .replace(/ç/g, "c");
 }
 
+function tokenizeFilename(filename: string) {
+  const baseName = filename.replace(/\.[^/.]+$/, "");
+  const rawTokens = baseName
+    .split(/[\s_\-().,+#]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  return {
+    baseName,
+    rawTokens,
+    tokens: rawTokens.map(normalizeToken),
+  };
+}
+
 function findByDictionary(tokens: string[], dictionary: Record<string, string[]>) {
   return (
     Object.entries(dictionary).find(([, terms]) =>
@@ -56,37 +76,40 @@ function findByDictionary(tokens: string[], dictionary: Record<string, string[]>
   );
 }
 
-export function analyzeFilename(filename: string): FilenameAnalysis {
-  const baseName = filename.replace(/\.[^/.]+$/, "");
-  const rawTokens = baseName
-    .split(/[\s_\-().,]+/)
-    .map((token) => token.trim())
-    .filter(Boolean);
-  const tokens = rawTokens.map(normalizeToken);
+export function extractCategoryFromFilename(filename: string): string {
+  const { tokens } = tokenizeFilename(filename);
+  return findByDictionary(tokens, categoryTerms);
+}
 
-  const category = findByDictionary(tokens, categoryTerms);
+function isManualCategoryAllowed(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (/[\d]/.test(trimmed)) return false;
+  if (/^[^a-zA-ZçğıöşüÇĞİÖŞÜ]+$/.test(trimmed)) return false;
+  return true;
+}
+
+export function resolveCategory(filename: string, manualCategory = "") {
+  const fromFilename = extractCategoryFromFilename(filename);
+  if (fromFilename) return fromFilename;
+
+  const manual = manualCategory.trim();
+  if (isManualCategoryAllowed(manual)) return manual;
+
+  return DEFAULT_CATEGORY;
+}
+
+export function analyzeFilename(filename: string): FilenameAnalysis {
+  const { baseName, rawTokens, tokens } = tokenizeFilename(filename);
+
+  const category = extractCategoryFromFilename(filename);
   const subcategory = findByDictionary(tokens, subcategoryTerms);
   const season = findByDictionary(tokens, seasons);
   const size =
     rawTokens.find((token) => /^(xxs|xs|s|m|l|xl|xxl|[0-9]{2})$/i.test(token)) ??
     "";
 
-  const knownTerms = new Set([
-    ...Object.values(categoryTerms).flat().map(normalizeToken),
-    ...Object.values(subcategoryTerms).flat().map(normalizeToken),
-    ...Object.values(seasons).flat().map(normalizeToken),
-    normalizeToken(size),
-    ...Array.from(stopWords).map(normalizeToken),
-  ]);
-
-  const tags = Array.from(
-    new Set(
-      rawTokens
-        .filter((token) => token.length > 1)
-        .filter((token) => !knownTerms.has(normalizeToken(token)))
-        .filter((token) => !/^[0-9]{2}$/.test(token)),
-    ),
-  );
+  const tags = [subcategory, season].filter(Boolean);
 
   return {
     title: baseName.replace(/[_-]+/g, " ").trim(),
@@ -98,5 +121,5 @@ export function analyzeFilename(filename: string): FilenameAnalysis {
   };
 }
 
-export const defaultCategories = Object.keys(categoryTerms);
+export const defaultCategories = [...Object.keys(categoryTerms), DEFAULT_CATEGORY];
 export const defaultSeasons = Object.keys(seasons);
