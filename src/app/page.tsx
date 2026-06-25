@@ -3,6 +3,7 @@
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { LoginScreen } from "@/components/login-screen";
 import {
   analyzeFilename,
   defaultCategories,
@@ -370,9 +371,27 @@ export default function Home() {
 
   if (authLoading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-stone-50 p-6 text-stone-700">
-        Arşiv hazırlanıyor...
+      <main className="login-loading-screen">
+        <div className="login-loading-card">
+          <span className="login-spinner border-stone-300 border-t-stone-700" />
+          <p className="text-sm font-medium text-stone-600">Arşiv hazırlanıyor...</p>
+        </div>
       </main>
+    );
+  }
+
+  if (!session) {
+    return (
+      <LoginScreen
+        configured={isSupabaseConfigured}
+        email={email}
+        error={error}
+        loading={loading}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+        onSubmit={handleLogin}
+        password={password}
+      />
     );
   }
 
@@ -394,20 +413,11 @@ export default function Home() {
               </p>
             </div>
 
-            {session ? (
-              <button className="secondary-button" onClick={handleLogout} type="button">
-                Çıkış Yap
-              </button>
-            ) : null}
+            <button className="secondary-button" onClick={handleLogout} type="button">
+              Çıkış Yap
+            </button>
           </div>
         </header>
-
-        {!isSupabaseConfigured ? (
-          <div className="status-card border-amber-200 bg-amber-50 text-amber-900">
-            Supabase bağlantısı için `.env.local` dosyasında URL ve anon key
-            değerlerini tanımlayın. Örnek alanlar `.env.example` içinde hazır.
-          </div>
-        ) : null}
 
         {error ? <div className="status-card border-red-200 bg-red-50 text-red-700">{error}</div> : null}
         {message ? (
@@ -416,65 +426,7 @@ export default function Home() {
           </div>
         ) : null}
 
-        {!session ? (
-          <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="panel p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold">Güvenli Giriş</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-600">
-                Supabase Auth üzerinde oluşturulan kullanıcı ile giriş yapılır.
-                Girişten sonra PDF yükleme, kategori düzenleme ve arşiv arama
-                ekranları açılır.
-              </p>
-              <form className="mt-6 grid gap-4" onSubmit={handleLogin}>
-                <label className="field-label">
-                  E-posta
-                  <input
-                    className="field-input"
-                    disabled={!isSupabaseConfigured || loading}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                    type="email"
-                    value={email}
-                  />
-                </label>
-                <label className="field-label">
-                  Şifre
-                  <input
-                    className="field-input"
-                    disabled={!isSupabaseConfigured || loading}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
-                    type="password"
-                    value={password}
-                  />
-                </label>
-                <button
-                  className="primary-button"
-                  disabled={!isSupabaseConfigured || loading}
-                  type="submit"
-                >
-                  {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-                </button>
-              </form>
-            </div>
-
-            <div className="panel p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold">Mobil Hazır</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-600">
-                Telefon ekranında tek kolonlu form, dokunmatik filtreler ve
-                PDF indirme/önizleme bağlantılarıyla sahada da kullanılabilir.
-              </p>
-              <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
-                {["PDF yükle", "Otomatik etiket", "Manuel filtre", "Önizle"].map((item) => (
-                  <span className="rounded-2xl bg-stone-100 p-4 font-medium" key={item}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
+        <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
             <form className="panel grid gap-4 p-5 sm:p-6" onSubmit={handleSave}>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-700">
@@ -710,7 +662,6 @@ export default function Home() {
               </div>
             </section>
           </section>
-        )}
 
         <datalist id="category-options">
           {categories.map((category) => (

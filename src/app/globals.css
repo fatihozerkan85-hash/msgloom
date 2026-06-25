@@ -10,6 +10,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display-serif);
+  --font-brand: var(--font-brand-script);
 }
 
 body {
@@ -66,5 +68,151 @@ a {
 
   .tag-chip {
     @apply rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 transition hover:bg-amber-200;
+  }
+
+  .login-shell {
+    @apply grid min-h-screen lg:grid-cols-[1.05fr_0.95fr];
+  }
+
+  .login-brand-panel {
+    @apply relative flex flex-col justify-between overflow-hidden bg-[#1f1a17] px-6 py-8 text-stone-100 sm:px-10 sm:py-12 lg:px-14 lg:py-16;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(180, 120, 80, 0.22), transparent 34%),
+      radial-gradient(circle at 80% 80%, rgba(120, 78, 52, 0.18), transparent 30%),
+      linear-gradient(160deg, #2a211d 0%, #1a1512 55%, #120f0d 100%);
+  }
+
+  .login-brand-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 18px,
+      rgba(255, 255, 255, 0.35) 18px,
+      rgba(255, 255, 255, 0.35) 19px
+    );
+    pointer-events: none;
+  }
+
+  .login-brand-inner {
+    @apply relative z-10 max-w-xl;
+  }
+
+  .login-eyebrow {
+    @apply text-[0.68rem] font-semibold tracking-[0.32em] text-amber-200/80 uppercase;
+  }
+
+  .login-brand-title {
+    font-family: var(--font-brand-script), cursive;
+    @apply mt-4 text-5xl leading-none font-bold text-white sm:text-6xl lg:text-7xl;
+  }
+
+  .login-brand-subtitle {
+    font-family: var(--font-display-serif), Georgia, serif;
+    @apply mt-3 text-2xl font-medium tracking-[0.12em] text-amber-100/90 uppercase sm:text-3xl;
+  }
+
+  .login-brand-copy {
+    @apply mt-6 max-w-md text-sm leading-7 text-stone-300 sm:text-base;
+  }
+
+  .login-feature-list {
+    @apply mt-10 grid gap-4 sm:gap-5;
+  }
+
+  .login-feature-item {
+    @apply flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm;
+  }
+
+  .login-feature-icon {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-200;
+  }
+
+  .login-feature-title {
+    @apply text-sm font-semibold text-white;
+  }
+
+  .login-feature-desc {
+    @apply mt-1 text-sm leading-6 text-stone-400;
+  }
+
+  .login-brand-footer {
+    @apply relative z-10 mt-10 flex items-center gap-3 text-xs tracking-[0.2em] text-stone-500 uppercase;
+  }
+
+  .login-brand-dot {
+    @apply h-1 w-1 rounded-full bg-amber-400/70;
+  }
+
+  .login-form-panel {
+    @apply flex items-center justify-center bg-[linear-gradient(180deg,#fffaf6_0%,#f3ebe3_100%)] px-4 py-10 sm:px-8 lg:px-12;
+  }
+
+  .login-form-card {
+    @apply w-full max-w-md rounded-[2rem] border border-white/80 bg-white/90 p-7 shadow-[0_24px_80px_rgba(28,25,23,0.08)] backdrop-blur sm:p-9;
+  }
+
+  .login-form-eyebrow {
+    @apply text-xs font-semibold tracking-[0.28em] text-amber-800 uppercase;
+  }
+
+  .login-form-title {
+    font-family: var(--font-display-serif), Georgia, serif;
+    @apply mt-3 text-3xl font-semibold text-stone-900;
+  }
+
+  .login-form-lead {
+    @apply mt-3 text-sm leading-7 text-stone-600;
+  }
+
+  .login-form {
+    @apply mt-8 grid gap-5;
+  }
+
+  .login-field {
+    @apply grid gap-2 text-sm font-medium text-stone-700;
+  }
+
+  .login-input {
+    @apply w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3.5 text-base text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:bg-white focus:ring-4 focus:ring-amber-100 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400;
+  }
+
+  .login-submit {
+    @apply mt-1 inline-flex min-h-[3rem] w-full items-center justify-center rounded-2xl bg-[#2f241f] px-5 py-3.5 text-sm font-semibold tracking-[0.04em] text-white shadow-lg shadow-stone-900/10 transition hover:bg-[#45352d] disabled:cursor-not-allowed disabled:bg-stone-400;
+  }
+
+  .login-submit-loading {
+    @apply inline-flex items-center gap-3;
+  }
+
+  .login-spinner {
+    @apply h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white;
+  }
+
+  .login-form-note {
+    @apply mt-6 text-center text-xs leading-6 text-stone-500;
+  }
+
+  .login-alert {
+    @apply mt-6 rounded-2xl border px-4 py-3 text-sm leading-6;
+  }
+
+  .login-alert-warning {
+    @apply border-amber-200 bg-amber-50 text-amber-900;
+  }
+
+  .login-alert-error {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .login-loading-screen {
+    @apply grid min-h-screen place-items-center bg-[linear-gradient(180deg,#fffaf6_0%,#f3ebe3_100%)];
+  }
+
+  .login-loading-card {
+    @apply flex flex-col items-center gap-4 rounded-[2rem] border border-white/80 bg-white/90 px-10 py-8 shadow-lg;
   }
 }

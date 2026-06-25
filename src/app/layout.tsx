@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Dancing_Script, Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Dancing_Script, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +17,12 @@ const dancingScript = Dancing_Script({
   subsets: ["latin-ext"],
 });
 
+const cormorant = Cormorant_Garamond({
+  variable: "--font-display-serif",
+  subsets: ["latin-ext"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Özlem Akyüz Kalıp Arşivi",
   description: "PDF giysi kalıpları için bulut tabanlı arşiv ve kategori yönetimi.",
@@ -30,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
